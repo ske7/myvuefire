@@ -1,0 +1,128 @@
+<template>
+  <v-toolbar color="indigo" dark fixed app clipped-left dense>
+    <v-toolbar-items color="indigo" dark>
+      <v-btn
+        color="indigo"
+        dark
+        flat
+        style="min-width:48px; max-width:96px;"
+        to="/">
+        <img :src="'/static/img/favicon.png'">
+      </v-btn>
+    </v-toolbar-items>
+    <v-toolbar-title>
+      <div class="hidden-xs-only">VueFire CRM</div>
+      <div class="hidden-sm-and-up subheading">VueFire CRM</div>
+    </v-toolbar-title>
+    <v-spacer/>
+    <v-btn
+      v-if="!userIsAuthenticated"
+      :to="'/login'"
+      small
+      color="green darken-1"
+      class="text-xs-center"
+      style="min-width:32px;"
+      dark>
+      <i class="fa fa-sign-in"/>
+      <span class="ml-2 hidden-xs-only">Login</span>
+    </v-btn>
+    <v-btn
+      v-if="!userIsAuthenticated"
+      :to="'/signup'"
+      small
+      color="primary"
+      class="text-xs-center"
+      style="min-width:32px;"
+      dark>
+      <i class="fa fa-thumbs-up"/>
+      <span class="ml-2 hidden-xs-only">Sign up</span>
+    </v-btn>
+    <v-btn
+      v-if="userIsAuthenticated"
+      :to="'/profile'"
+      small
+      color="primary"
+      class="text-xs-center"
+      style="min-width:32px;"
+      dark>
+      <i class="fa fa-user"/>
+      <span class="ml-2 hidden-xs-only">Profile</span>
+    </v-btn>
+    <v-btn
+      v-if="userIsAdmin"
+      :to="'/admin'"
+      small
+      color="red darken-4"
+      class="text-xs-center"
+      style="min-width:32px;"
+      dark>
+      <i class="fa fa-key"/>
+      <span class="ml-2 hidden-xs-only">Admin</span>
+    </v-btn>
+    <v-btn
+      v-if="userIsAuthenticated"
+      small
+      color="primary"
+      class="text-xs-center"
+      style="min-width:32px;"
+      dark
+      @click="onTryToLogout()">
+      <i class="fa fa-sign-out"/>
+      <span class="ml-2 hidden-xs-only">Logout</span>
+    </v-btn>
+    <p/>
+
+    <v-dialog v-model="logoutdialog" max-width="280" persistent transition="fade-transition">
+      <v-card>
+        <v-layout row justify-center align-center>
+          <v-card-title class="subheading text-xs-center">Do you  really want to logout?</v-card-title>
+        </v-layout>
+        <v-layout row justify-center align-center>
+          <v-flex text-xs-center mb-1>
+            <v-btn small color="green darken-5" outline @click.native="onLogout()">Yes</v-btn>
+            <v-btn small color="green darken-5" outline @click.native="logoutdialog = false">Cancel</v-btn>
+          </v-flex>
+        </v-layout>
+      </v-card>
+    </v-dialog>
+  </v-toolbar>
+</template>
+
+<script>
+export default {
+	name: "Header",
+	data() {
+		return {
+			logoutdialog: false
+		};
+	},
+	computed: {
+		userIsAuthenticated() {
+			return (
+				this.$store.getters.user !== null &&
+				this.$store.getters.user !== undefined
+			);
+		},
+		userIsAdmin() {
+			return (
+				this.$store.getters.user !== null &&
+				this.$store.getters.user !== undefined &&
+				this.$store.getters.isadminemail === true
+			);
+		}
+	},
+	methods: {
+		onTryToLogout() {
+			this.logoutdialog = true;
+		},
+		onLogout() {
+			this.logoutdialog = false;
+			this.$store.dispatch("logout").then(
+				() => {
+					this.$router.push("/");
+				}
+			);
+		}
+	}
+};
+</script>
