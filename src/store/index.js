@@ -17,7 +17,9 @@ export const store = new Vuex.Store({
 		signUpProcess: false,
 		authpreparing: true,
 		error: null,
-		confData: null
+		confData: null,
+		ip: "0.0.0.0",
+		ipdata: null
 	},
 
 	mutations: {
@@ -53,6 +55,18 @@ export const store = new Vuex.Store({
 		},
 		setUserPhotoURL(state, payload) {
 			state.user.photoURL = payload;
+		},
+		setUserIP(state, payload) {
+			if (state.user) {
+				state.user.ip = payload;
+			}
+			state.ip = payload;
+		},
+		setUserIPData(state, payload) {
+			if (state.user) {
+				state.user.ipdata = payload;
+			}
+			state.ipdata = payload;
 		}
 	},
 

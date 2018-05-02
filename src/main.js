@@ -8,6 +8,7 @@ import VueResource from "vue-resource";
 import Vuetify from "vuetify";
 import "vuetify/dist/vuetify.min.css";
 import colors from "vuetify/es5/util/colors";
+import axios from "axios";
 
 import { router } from "./router";
 import { store } from "./store";
@@ -56,6 +57,18 @@ store
 			}
 			if (!vm) {
 				if (user) {
+					await axios
+						.get("https://ipapi.co/json/")
+						.then((response) => {
+							store.commit("setUserIP", response.data.ip);
+							store.commit("setUserIPData", response.data);
+						})
+						.catch((error) => {
+							store.commit("setUserIP", "0.0.0.0");
+							store.commit("setUserIPData", null);
+							store.commit("setError", error);
+						});
+
 					await store.dispatch("autoLogin", user);
 				} else {
 					await store.dispatch("logout");

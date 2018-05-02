@@ -4,6 +4,8 @@ import "firebase/auth";
 import "firebase/firestore";
 import "firebase/storage";
 
+import { store } from "@/store";
+
 // Firebase service instances and config
 let config = {
 	apiKey: "AIzaSyBoZ7fgZiSHbsDfwk0hDIeDavqe3uNe_yw",
@@ -36,7 +38,13 @@ function addUser(user, isAdmin) {
 				isAdmin: isAdmin
 			})
 			.then(() => {
-				userRef.collection("logins").add({ loginTime: user.metadata.lastSignInTime, emailVerified: false });
+				userRef.collection("logins").add({
+					loginTime: user.metadata.lastSignInTime,
+					emailVerified: false,
+					userip: store.state.ip,
+					latitude: store.state.ipdata.latitude,
+					longitude: store.state.ipdata.longitude
+				});
 				resolve(userRef);
 			})
 			.catch((error) => {
@@ -67,7 +75,13 @@ function updateUserInfoWhenLogin(uid, emailVerified, lastSignInTime) {
 				{ merge: true }
 			)
 			.then(() => {
-				userRef.collection("logins").add({ loginTime: lastSignInTime, emailVerified: emailVerified });
+				userRef.collection("logins").add({
+					loginTime: lastSignInTime,
+					emailVerified: emailVerified,
+					userip: store.state.ip,
+					latitude: store.state.ipdata.latitude,
+					longitude: store.state.ipdata.longitude
+				});
 				resolve(userRef);
 			})
 			.catch((error) => {
