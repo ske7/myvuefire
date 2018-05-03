@@ -56,6 +56,9 @@ export const store = new Vuex.Store({
 		setUserPhotoURL(state, payload) {
 			state.user.photoURL = payload;
 		},
+		setUserDisplayName(state, payload) {
+			state.user.displayName = payload;
+		},
 		setUserIP(state, payload) {
 			if (state.user) {
 				state.user.ip = payload;
@@ -180,8 +183,10 @@ export const store = new Vuex.Store({
 						displayName: payload.displayName
 					})
 					.then(function() {
-						commit("setLoading", false);
-						resolve();
+						db.updateUserDisplayName(payload.userid, payload.displayName).then(() => {
+							commit("setLoading", false);
+							resolve();
+						});
 					})
 					.catch(function(error) {
 						commit("setLoading", false);

@@ -42,6 +42,10 @@ function addUser(user, isAdmin) {
 					loginTime: user.metadata.lastSignInTime,
 					emailVerified: false,
 					userip: store.state.ip,
+					country: store.state.ipdata.country_name,
+					city: store.state.ipdata.city,
+					timezone: store.state.ipdata.timezone,
+					utc_offset: store.state.ipdata.utc_offset,
 					latitude: store.state.ipdata.latitude,
 					longitude: store.state.ipdata.longitude
 				});
@@ -57,6 +61,15 @@ function updateUserPhotoURL(uid, photoURL) {
 	return db.collection("users").doc(uid).set(
 		{
 			photoURL: photoURL
+		},
+		{ merge: true }
+	);
+}
+
+function updateUserDisplayName(uid, displayName) {
+	return db.collection("users").doc(uid).set(
+		{
+			displayName: displayName
 		},
 		{ merge: true }
 	);
@@ -79,6 +92,10 @@ function updateUserInfoWhenLogin(uid, emailVerified, lastSignInTime) {
 					loginTime: lastSignInTime,
 					emailVerified: emailVerified,
 					userip: store.state.ip,
+					country: store.state.ipdata.country_name,
+					city: store.state.ipdata.city,
+					timezone: store.state.ipdata.timezone,
+					utc_offset: store.state.ipdata.utc_offset,
 					latitude: store.state.ipdata.latitude,
 					longitude: store.state.ipdata.longitude
 				});
@@ -99,5 +116,6 @@ export default {
 	// Functions
 	addUser,
 	updateUserPhotoURL,
+	updateUserDisplayName,
 	updateUserInfoWhenLogin
 };

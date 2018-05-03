@@ -94,7 +94,7 @@
               </v-layout>
               <v-layout row justify-center align-center>
                 <v-flex xs12 text-xs-center>
-                  <v-btn :disabled="loading || !needToUpdate" :loading="loading" style="max-width:150px;" type="submit">
+                  <v-btn :disabled="loading || !needToUpdate" :loading="loading" style="max-width:150px;" type="submit" @click.native="onUpdateProfile()">
                     Update profile
                     <span slot="loader" class="custom-loader">
                       <v-icon light>cached</v-icon>
@@ -259,12 +259,14 @@ export default {
 		onUpdateProfile() {
 			this.profileUpdated = false;
 			this.$store.dispatch("updateUserProfile", {
+				userid: this.$store.getters.user.uid,
 				displayName: this.displayName
 			}).then(
 				() => {
 					this.alertUpdateText = "Your profile updated successfully!";
 					this.alertColor = "success";
 					this.oldDisplayName = this.displayName;
+					this.$store.commit("setUserDisplayName", this.displayName);
 					this.profileUpdated = true;
 				}
 			).catch(

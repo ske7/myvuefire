@@ -9,7 +9,7 @@ import Signup from "@/components/User/Signup";
 import Login from "@/components/User/Login";
 import Reset from "@/components/User/Reset";
 import Profile from "@/components/User/Profile";
-import Admin from "@/components/Admin";
+import Admin from "@/components/Admin/Admin";
 
 import { store } from "@/store";
 
