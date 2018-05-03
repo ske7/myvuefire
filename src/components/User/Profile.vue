@@ -35,7 +35,7 @@
               <v-tooltip bottom open-delay="500">
                 <v-btn slot="activator" icon @click="onChooseProfileImage()">
                   <v-avatar size="90px" color="green lighten-5" tile>
-                    <img :src="photoURL" :class="imgstyleclass" alt="profile image" height="90" width="90" >
+                    <img :src="photoURL" :class="imgstyleclass" alt="profile image" height="90" width="90">
                   </v-avatar>
                 </v-btn>
                 <span>Load profile image</span>
@@ -185,7 +185,7 @@ export default {
 				fontSize: "13px"
 			},
 			photoURL: "",
-			imgstyleclass: "imgbefore"
+			imgstyleclass: "profimgbefore"
 		};
 	},
 	computed: {
@@ -225,9 +225,9 @@ export default {
 			this.oldDisplayName = this.$store.getters.user.displayName;
 			this.emailVerified = this.$store.getters.user.emailVerified;
 			this.photoURL = this.$store.getters.user.photoURL;
-			this.imgstyleclass = "imgbefore";
+			this.imgstyleclass = "profimgbefore";
 			if (this.photoURL) {
-				this.imgstyleclass = "imgafter";
+				this.imgstyleclass = "profimgafter";
 			}
 			if (!this.emailVerified) {
 				this.needToVerify = true;
@@ -387,7 +387,7 @@ export default {
 					}
 				};
 			}).then(() => {
-				this.imgstyleclass = "imgafter";
+				this.imgstyleclass = "profimgafter";
 				fileReader.onloadend = null;
 				fileReader.readAsDataURL(file);
 				this.$store.dispatch("setProfileImage", {
@@ -410,18 +410,3 @@ export default {
 	}
 };
 </script>
-
-<style scoped>
-.imgbefore {
-  color: purple;
-  font-size: 11px;
-  /* font-family:  'Roboto', sans-serif; */
-  font-style:italic;
-  display: block;
-  text-align: center;
-  padding-top: 33px;
-}
-.imgafter {
-  color: transparent;
-}
-</style>
