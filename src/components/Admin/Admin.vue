@@ -42,9 +42,11 @@
           </v-list-tile>
       </v-flex></v-list>
     </v-navigation-drawer>
-    <v-layout row wrap class="page green-border" text-xs-center>
-      <v-flex fluid>
-        <h1 class="display-1">{{ msg }}</h1>
+    <v-layout row wrap text-xs-center>
+      <v-flex>
+        <component :is="currentItemComponent">
+          <h1 slot="title">{{ title }}</h1>
+        </component>
       </v-flex>
     </v-layout>
   </v-container>
@@ -55,15 +57,21 @@ import db from "@/dbfunc/db";
 
 export default {
 	name: "Admin",
+	components: {
+		"Config": () => import("./Config.vue"),
+		"Users": () => import("./Users.vue")
+	},
 	data() {
 		return {
 			drawer: true,
+
+			currentItemComponent: "Config",
 			items: [
-				{ id: 1, title: "Config", icon: "build" },
-				{ id: 2, title: "Users", icon: "group" }
+				{ id: 0, title: "Config", icon: "build" },
+				{ id: 1, title: "Users", icon: "group" }
 			],
 			mini: true,
-			msg: "Admin panel!"
+			title: "Admin panel!"
 		};
 	},
 	created() {
@@ -77,12 +85,8 @@ export default {
 	},
 	methods: {
 		chooseAdminPage(id) {
-			if (id === 1) {
-				this.msg = "Config";
-			}
-			if (id === 2) {
-				this.msg = "Users";
-			}
+			this.currentItemComponent = this.items[id].title;
+			this.title = this.items[id].title;
 		}
 	}
 };
@@ -90,6 +94,6 @@ export default {
 
 <style scoped>
 .page {
-	height: 50vh;
+	height: auto;
 }
 </style>
