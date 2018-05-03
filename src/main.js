@@ -56,19 +56,18 @@ store
 				});
 			}
 			if (!vm) {
+				await axios
+					.get("https://ipapi.co/json/")
+					.then((response) => {
+						store.commit("setUserIP", response.data.ip);
+						store.commit("setUserIPData", response.data);
+					})
+					.catch((error) => {
+						store.commit("setUserIP", "0.0.0.0");
+						store.commit("setUserIPData", null);
+						store.commit("setError", error);
+					});
 				if (user) {
-					await axios
-						.get("https://ipapi.co/json/")
-						.then((response) => {
-							store.commit("setUserIP", response.data.ip);
-							store.commit("setUserIPData", response.data);
-						})
-						.catch((error) => {
-							store.commit("setUserIP", "0.0.0.0");
-							store.commit("setUserIPData", null);
-							store.commit("setError", error);
-						});
-
 					await store.dispatch("autoLogin", user);
 				} else {
 					await store.dispatch("logout");
