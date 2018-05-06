@@ -6,7 +6,7 @@
           <v-card-title primary-title class="headline justify-center">
             <div text-xs-center>User profile</div>
           </v-card-title>
-          <v-layout row wrap mr-1>
+          <v-layout row wrap mr-2>
             <v-flex xs10>
               <v-card-text>
                 <span class="indigo--text subheading">Email:</span> {{ email }}
@@ -31,21 +31,39 @@
                 </span>
               </v-card-text>
             </v-flex>
-            <v-flex xs2 class="hidden-xs-only">
-              <v-tooltip bottom open-delay="500">
-                <v-btn slot="activator" icon @click="onChooseProfileImage()">
-                  <v-avatar size="90px" color="green lighten-5" tile>
-                    <img :src="photoURL" :class="imgstyleclass" alt="profile image" height="90" width="90">
-                  </v-avatar>
-                </v-btn>
-                <span>Load profile image</span>
-              </v-tooltip>
-              <input
-                ref="profileImgInput"
-                type="file"
-                class="disp-none"
-                accept="image/jpeg, image/png"
-                @change="onFilePicked($event)">
+            <v-flex xs2>
+              <v-card flat>
+                <v-toolbar dense card height="20px" color="transparent">
+                  <v-tooltip bottom open-delay="500">
+                    <v-btn slot="activator" :loading="imgloading" :disabled="imgloading" small flat @click="onChooseProfileImage()">
+                      <v-icon small color="blue darken-4">attachment</v-icon>
+                    </v-btn>
+                    <span slot="loader" class="custom-loader">
+                      <v-icon light>cached</v-icon>
+                    </span>
+                    <span>Load profile image</span>
+                  </v-tooltip>
+                  <v-tooltip bottom open-delay="500">
+                    <v-btn slot="activator" small flat right @click="onChooseToDeleteProfileImage()">
+                      <v-icon small color="blue darken-4">clear</v-icon>
+                    </v-btn>
+                    <span>Delete profile image</span>
+                  </v-tooltip>
+                </v-toolbar>
+                <div :class="imgstyleclass">
+                  <v-card-media
+                    :src="photoURL"
+                    height="90px"
+                    contain
+                  />
+                </div>
+                <input
+                  ref="profileImgInput"
+                  type="file"
+                  class="disp-none"
+                  accept="image/jpeg, image/png"
+                  @change="onFilePicked($event)">
+              </v-card>
             </v-flex>
           </v-layout>
           <v-container>
@@ -150,6 +168,19 @@
         </v-layout>
       </v-card>
     </v-dialog>
+    <v-dialog v-model="profimgdeletedialog" max-width="280" persistent transition="fade-transition">
+      <v-card>
+        <v-layout row justify-center align-center>
+          <v-card-title class="subheading text-xs-center">Do you really want to delete your profile image?</v-card-title>
+        </v-layout>
+        <v-layout row justify-center align-center>
+          <v-flex text-xs-center mb-2>
+            <v-btn small color="green darken-5" outline @click.native="onDeleteProfileImage()">Yes</v-btn>
+            <v-btn small color="green darken-5" outline @click.native="profimgdeletedialog = false">Cancel</v-btn>
+          </v-flex>
+        </v-layout>
+      </v-card>
+    </v-dialog>
   </v-container>
 </template>
 
@@ -179,13 +210,14 @@ export default {
 			alreadyChangePassword: true,
 			relogindialog: false,
 			relogindialog2: false,
+			profimgdeletedialog: false,
 			needToVerify: false,
 			verifiedStyle: {
 				color: "green",
 				fontSize: "13px"
 			},
 			photoURL: "",
-			imgstyleclass: "profimgbefore"
+			imgstyleclass: "img-green-border-small"
 		};
 	},
 	computed: {
@@ -210,6 +242,9 @@ export default {
 		loading3() {
 			return this.$store.getters.loading3;
 		},
+		imgloading() {
+			return this.$store.getters.imgloading;
+		},
 		needToUpdate() {
 			return (this.oldDisplayName !== this.displayName);
 		},
@@ -225,7 +260,7 @@ export default {
 			this.oldDisplayName = this.$store.getters.user.displayName;
 			this.emailVerified = this.$store.getters.user.emailVerified;
 			this.photoURL = this.$store.getters.user.photoURL;
-			this.imgstyleclass = "profimgbefore";
+			this.imgstyleclass = "img-green-border-small";
 			if (this.photoURL) {
 				this.imgstyleclass = "profimgafter";
 			}
@@ -327,6 +362,28 @@ export default {
 				}
 			);
 		},
+		onChooseToDeleteProfileImage() {
+			if (this.photoURL !== "") {
+				this.profimgdeletedialog = true;
+			}
+		},
+		onDeleteProfileImage() {
+			this.profimgdeletedialog = false;
+			let extension = this.photoURL.substring(this.photoURL.lastIndexOf("."), this.photoURL.lastIndexOf(".") + 4);
+			if (extension === ".jpe") {
+				extension = ".jpeg";
+			}
+
+			this.$store.dispatch("deleteProfileImage", {
+				userid: this.$store.getters.user.uid,
+				ext: extension
+			}).then(() => {
+				this.imgstyleclass = "img-green-border-small";
+				this.photoURL = "";
+				this.$store.commit("setUserPhotoURL", "");
+				this.$store.commit("setImgLoading", false);
+			});
+		},
 		onChooseProfileImage() {
 			this.$refs.profileImgInput.click();
 		},
@@ -354,10 +411,6 @@ export default {
 			let imgstyleclassSave = this.imgstyleclass;
 
 			const fileReader = new FileReader();
-			fileReader.addEventListener("load", () => {
-				this.photoURL = fileReader.result;
-			});
-
 			const getMimetype = (signature) => {
 				switch (signature) {
 				case "89504E47":
@@ -389,7 +442,6 @@ export default {
 					}
 				};
 			}).then(() => {
-				this.imgstyleclass = "profimgafter";
 				fileReader.onloadend = null;
 				fileReader.readAsDataURL(file);
 				this.$store.dispatch("setProfileImage", {
@@ -397,8 +449,10 @@ export default {
 					ext: extension,
 					image: file
 				}).then((metadata) => {
+					this.imgstyleclass = "profimgafter";
 					this.$store.commit("setUserPhotoURL", metadata.downloadURLs[0]);
 					this.photoURL = metadata.downloadURLs[0];
+					this.$store.commit("setImgLoading", false);
 				});
 			}).catch((error) => {
 				this.imgstyleclass = imgstyleclassSave;
@@ -412,3 +466,10 @@ export default {
 	}
 };
 </script>
+
+<style scoped>
+	.btn {
+		min-height: 10px;
+		min-width: 10px;
+	}
+</style>

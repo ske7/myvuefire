@@ -15,6 +15,7 @@ export const store = new Vuex.Store({
 		loading2: false,
 		loading3: false,
 		signUpProcess: false,
+		imgloading: false,
 		authpreparing: true,
 		error: null,
 		confData: null,
@@ -37,6 +38,9 @@ export const store = new Vuex.Store({
 		},
 		setSignUpProcess(state, payload) {
 			state.signUpProcess = payload;
+		},
+		setImgLoading(state, payload) {
+			state.imgloading = payload;
 		},
 		setAuthPreparing(state, payload) {
 			state.authpreparing = payload;
@@ -280,7 +284,7 @@ export const store = new Vuex.Store({
 		},
 		setProfileImage({ commit }, payload) {
 			return new Promise((resolve, reject) => {
-				commit("setLoading", true);
+				commit("setImgLoading", true);
 				commit("clearError");
 
 				db.storage
@@ -296,23 +300,41 @@ export const store = new Vuex.Store({
 								db
 									.updateUserPhotoURL(payload.userid, filedata.metadata.downloadURLs[0])
 									.then(() => {
-										commit("setLoading", false);
 										resolve(filedata.metadata);
-									})
-									.catch((error) => {
-										commit("setLoading", false);
-										commit("setError", error);
-										reject(error);
 									});
-							})
-							.catch(function(error) {
-								commit("setLoading", false);
-								commit("setError", error);
-								reject(error);
 							});
 					})
 					.catch((error) => {
-						commit("setLoading", false);
+						commit("setImgLoading", false);
+						commit("setError", error);
+						reject(error);
+					});
+			});
+		},
+		deleteProfileImage({ commit }, payload) {
+			return new Promise((resolve, reject) => {
+				commit("setImgLoading", true);
+				commit("clearError");
+
+				db.storage
+					.ref().child("profileImages/" + payload.userid + "/pImg_" + payload.userid + payload.ext)
+					.delete()
+					.then(() => {
+						let currentUser = db.auth.currentUser;
+						currentUser
+							.updateProfile({
+								photoURL: ""
+							})
+							.then(function() {
+								db
+									.updateUserPhotoURL(payload.userid, "")
+									.then(() => {
+										resolve();
+									});
+							});
+					})
+					.catch((error) => {
+						commit("setImgLoading", false);
 						commit("setError", error);
 						reject(error);
 					});
@@ -332,6 +354,9 @@ export const store = new Vuex.Store({
 		},
 		loading3(state) {
 			return state.loading3;
+		},
+		imgloading(state) {
+			return state.imgloading;
 		},
 		signUpProcess(state) {
 			return state.signUpProcess;
