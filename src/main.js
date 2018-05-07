@@ -4,7 +4,6 @@ import "event-source-polyfill";
 
 // Packages
 import Vue from "vue";
-import VueResource from "vue-resource";
 import Vuetify from "vuetify";
 import "vuetify/dist/vuetify.min.css";
 import colors from "vuetify/es5/util/colors";
@@ -31,9 +30,9 @@ Vue.use(Vuetify, {
 		warning: "#FFC107"
 	}
 });
-Vue.use(VueResource);
-Vue.http.options.root = "/";
+
 Vue.component("app-alert", AlertCmp);
+Vue.prototype.$http = axios;
 
 let vm;
 store.commit("setAuthPreparing", true);

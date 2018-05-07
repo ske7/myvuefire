@@ -1,7 +1,7 @@
 import Vue from "vue";
 import Vuex from "vuex";
 
-import { router } from "@/router";
+import axios from "axios";
 import db from "@/dbfunc/db";
 
 Vue.use(Vuex);
@@ -144,15 +144,10 @@ export const store = new Vuex.Store({
 					});
 			});
 		},
-		autoLogin({ commit, dispatch, state }, payload) {
+		autoLogin({ commit }, payload) {
 			let lastSignInTime = new Date().toUTCString();
 			db
 				.updateUserInfoWhenLogin(payload.uid, payload.emailVerified, lastSignInTime)
-				.then(() => {
-					if (!payload.emailVerified) {
-						router.push("/profile");
-					}
-				})
 				.catch((error) => {
 					commit("setError", error);
 				});
@@ -272,10 +267,10 @@ export const store = new Vuex.Store({
 		},
 		getconfJSON({ commit }) {
 			return new Promise((resolve, reject) => {
-				Vue.http
+				axios
 					.get("/static/conf/conf.json")
 					.then((response) => {
-						resolve(response.json());
+						resolve(response.data);
 					})
 					.catch((error) => {
 						reject(error);

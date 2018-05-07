@@ -2,6 +2,7 @@ import Vue from "vue";
 import Router from "vue-router";
 
 import db from "@/dbfunc/db";
+import { store } from "@/store";
 
 // Pages
 import Page from "@/components/Page";
@@ -10,8 +11,6 @@ import Login from "@/components/User/Login";
 import Reset from "@/components/User/Reset";
 import Profile from "@/components/User/Profile";
 import Admin from "@/components/Admin/Admin";
-
-import { store } from "@/store";
 
 Vue.use(Router);
 
@@ -72,7 +71,7 @@ export const router = new Router({
 });
 
 router.beforeEach((to, from, next) => {
-	if (!store.getters.isUserVerified && to.path !== "/") {
+	if (!store.getters.isUserVerified && to.path !== "/" && to.path !== "/profile") {
 		next("/");
 	}
 

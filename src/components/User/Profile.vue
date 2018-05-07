@@ -33,9 +33,9 @@
             </v-flex>
             <v-flex xs2>
               <v-card flat>
-                <v-toolbar dense card height="20px" color="transparent">
+                <v-toolbar dense card height="22px" color="transparent">
                   <v-tooltip bottom open-delay="500">
-                    <v-btn slot="activator" :loading="imgloading" :disabled="imgloading" small flat @click="onChooseProfileImage()">
+                    <v-btn slot="activator" :loading="imgloading" :disabled="imgloading" class="btnprof" small flat @click="onChooseProfileImage()">
                       <v-icon small color="blue darken-4">attachment</v-icon>
                     </v-btn>
                     <span slot="loader" class="custom-loader">
@@ -44,7 +44,7 @@
                     <span>Load profile image</span>
                   </v-tooltip>
                   <v-tooltip bottom open-delay="500">
-                    <v-btn slot="activator" small flat right @click="onChooseToDeleteProfileImage()">
+                    <v-btn slot="activator" :disabled="imgloading" class="btnprof" small flat right @click="onChooseToDeleteProfileImage()">
                       <v-icon small color="blue darken-4">clear</v-icon>
                     </v-btn>
                     <span>Delete profile image</span>
@@ -468,8 +468,10 @@ export default {
 </script>
 
 <style scoped>
-	.btn {
-		min-height: 10px;
-		min-width: 10px;
+	.btnprof {
+		min-height: 5px;
+		min-width: 5px;
+		height: 18px;
+		width: 25px;
 	}
 </style>
