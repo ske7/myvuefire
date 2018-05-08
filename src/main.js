@@ -5,6 +5,7 @@ import "event-source-polyfill";
 // Packages
 import Vue from "vue";
 import Vuetify from "vuetify";
+import VeeValidate from "vee-validate";
 import "vuetify/dist/vuetify.min.css";
 import colors from "vuetify/es5/util/colors";
 import axios from "axios";
@@ -30,6 +31,7 @@ Vue.use(Vuetify, {
 		warning: "#FFC107"
 	}
 });
+Vue.use(VeeValidate);
 
 Vue.component("app-alert", AlertCmp);
 Vue.prototype.$http = axios;

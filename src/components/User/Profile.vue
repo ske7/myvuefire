@@ -33,7 +33,7 @@
             </v-flex>
             <v-flex xs2>
               <v-card flat>
-                <v-toolbar dense card height="22px" color="transparent">
+                <v-toolbar dense card height="25px" color="transparent">
                   <v-tooltip bottom open-delay="500">
                     <v-btn slot="activator" :loading="imgloading" :disabled="imgloading" class="btnprof" small flat @click="onChooseProfileImage()">
                       <v-icon small color="blue darken-4">attachment</v-icon>
@@ -50,13 +50,11 @@
                     <span>Delete profile image</span>
                   </v-tooltip>
                 </v-toolbar>
-                <div :class="imgstyleclass">
-                  <v-card-media
-                    :src="photoURL"
-                    height="90px"
-                    contain
-                  />
-                </div>
+                <v-card-media
+                  :src="profileImg"
+                  height="80px"
+                  contain
+                />
                 <input
                   ref="profileImgInput"
                   type="file"
@@ -216,8 +214,7 @@ export default {
 				color: "green",
 				fontSize: "13px"
 			},
-			photoURL: "",
-			imgstyleclass: "img-green-border-small"
+			photoURL: ""
 		};
 	},
 	computed: {
@@ -250,6 +247,13 @@ export default {
 		},
 		needToChangePassword() {
 			return (this.password !== "") && !this.alreadyChangePassword;
+		},
+		profileImg() {
+			if (this.photoURL) {
+				return this.photoURL;
+			} else {
+				return require("../../assets/profiledefault.jpg");
+			}
 		}
 	},
 	created() {
@@ -259,10 +263,10 @@ export default {
 			this.displayName = this.$store.getters.user.displayName;
 			this.oldDisplayName = this.$store.getters.user.displayName;
 			this.emailVerified = this.$store.getters.user.emailVerified;
-			this.photoURL = this.$store.getters.user.photoURL;
-			this.imgstyleclass = "img-green-border-small";
-			if (this.photoURL) {
-				this.imgstyleclass = "profimgafter";
+			if (this.$store.getters.user.photoURL) {
+				this.photoURL = this.$store.getters.user.photoURL;
+			} else {
+				this.photoURL = "";
 			}
 			if (!this.emailVerified) {
 				this.needToVerify = true;
@@ -378,7 +382,6 @@ export default {
 				userid: this.$store.getters.user.uid,
 				ext: extension
 			}).then(() => {
-				this.imgstyleclass = "img-green-border-small";
 				this.photoURL = "";
 				this.$store.commit("setUserPhotoURL", "");
 				this.$store.commit("setImgLoading", false);
@@ -408,7 +411,6 @@ export default {
 			}
 
 			let photoURLSave = this.photoURL;
-			let imgstyleclassSave = this.imgstyleclass;
 
 			const fileReader = new FileReader();
 			const getMimetype = (signature) => {
@@ -449,13 +451,11 @@ export default {
 					ext: extension,
 					image: file
 				}).then((metadata) => {
-					this.imgstyleclass = "profimgafter";
 					this.$store.commit("setUserPhotoURL", metadata.downloadURLs[0]);
 					this.photoURL = metadata.downloadURLs[0];
 					this.$store.commit("setImgLoading", false);
 				});
 			}).catch((error) => {
-				this.imgstyleclass = imgstyleclassSave;
 				this.photoURL = photoURLSave;
 				this.$store.commit("setError", error);
 				return false;
@@ -471,7 +471,7 @@ export default {
 	.btnprof {
 		min-height: 5px;
 		min-width: 5px;
-		height: 18px;
+		height: 20px;
 		width: 25px;
 	}
 </style>
