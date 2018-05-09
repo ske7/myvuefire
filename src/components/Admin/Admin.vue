@@ -22,8 +22,8 @@
         </v-flex>
       </v-list>
     </v-navigation-drawer>
-    <v-layout row wrap text-xs-center>
-      <v-flex>
+    <v-layout row wrap justify-center align-center>
+      <v-flex text-xs-center xs12>
         <component :is="currentItemComponent">
           <h1 slot="title">{{ title }}</h1>
         </component>

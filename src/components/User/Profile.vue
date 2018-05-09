@@ -31,36 +31,45 @@
                 </span>
               </v-card-text>
             </v-flex>
-            <v-flex xs2>
+            <v-flex xs2 wrap>
               <v-card flat>
-                <v-toolbar dense card height="25px" color="transparent">
-                  <v-tooltip bottom open-delay="500">
-                    <v-btn slot="activator" :loading="imgloading" :disabled="imgloading" class="btnprof" small flat @click="onChooseProfileImage()">
-                      <v-icon small color="blue darken-4">attachment</v-icon>
-                    </v-btn>
-                    <span slot="loader" class="custom-loader">
-                      <v-icon light>cached</v-icon>
-                    </span>
-                    <span>Load profile image</span>
-                  </v-tooltip>
-                  <v-tooltip bottom open-delay="500">
-                    <v-btn slot="activator" :disabled="imgloading" class="btnprof" small flat right @click="onChooseToDeleteProfileImage()">
-                      <v-icon small color="blue darken-4">clear</v-icon>
-                    </v-btn>
-                    <span>Delete profile image</span>
-                  </v-tooltip>
-                </v-toolbar>
-                <v-card-media
-                  :src="profileImg"
-                  height="80px"
-                  contain
-                />
-                <input
-                  ref="profileImgInput"
-                  type="file"
-                  class="disp-none"
-                  accept="image/jpeg, image/png"
-                  @change="onFilePicked($event)">
+                <v-layout row justify-center align-center wrap>
+                  <v-flex text-xs-center fluid>
+                    <v-toolbar dense card height="22px" color="transparent">
+                      <v-tooltip bottom open-delay="500">
+                        <v-btn slot="activator" :loading="imgloading" :disabled="imgloading" class="btnprof" small flat @click="onChooseProfileImage()">
+                          <v-icon small color="blue darken-4">attachment</v-icon>
+                        </v-btn>
+                        <span slot="loader" class="custom-loader">
+                          <v-icon light>cached</v-icon>
+                        </span>
+                        <span>Load profile image</span>
+                      </v-tooltip>
+                      <v-tooltip bottom open-delay="500">
+                        <v-btn slot="activator" :disabled="imgloading" class="btnprof" small flat @click="onChooseToDeleteProfileImage()">
+                          <v-icon small color="blue darken-4">clear</v-icon>
+                        </v-btn>
+                        <span>Delete profile image</span>
+                      </v-tooltip>
+                    </v-toolbar>
+                  </v-flex>
+                </v-layout>
+                <v-layout row justify-center align-center>
+                  <v-flex text-xs-center fluid>
+                    <div style="cursor:pointer" @click="onChooseProfileImage()">
+                      <v-card-media
+                        :src="profileImg"
+                        height="80px"
+                        contain/>
+                    </div>
+                    <input
+                      ref="profileImgInput"
+                      type="file"
+                      class="disp-none"
+                      accept="image/jpeg, image/png"
+                      @change="onFilePicked($event)">
+                  </v-flex>
+                </v-layout>
               </v-card>
             </v-flex>
           </v-layout>
@@ -469,9 +478,9 @@ export default {
 
 <style scoped>
 	.btnprof {
-		min-height: 5px;
-		min-width: 5px;
+		min-height: 10px;
+		min-width: 10px;
 		height: 20px;
-		width: 25px;
+		width: 22px;
 	}
 </style>

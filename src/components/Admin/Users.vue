@@ -1,37 +1,33 @@
 <template>
-  <v-container fluid fill-height grid-list-md>
-    <v-layout row>
-      <v-flex>
-        <slot name="title"/>
-        <v-data-table
-          :headers="headers"
-          :items="items"
-          :loading="dataloading"
-          class="elevation-1 mt-2"
-        >
-          <template slot="headerCell" slot-scope="props">
-            <v-tooltip bottom>
-              <span slot="activator">
-                {{ props.header.text }}
-              </span>
-              <span>
-                {{ props.header.text }}
-              </span>
-            </v-tooltip>
-          </template>
-          <v-progress-linear slot="progress" :indeterminate="dataloading" color="blue"/>
-          <template slot="items" slot-scope="props">
-            <td class="text-xs-left">{{ props.item.displayName }}</td>
-            <td class="text-xs-left">{{ props.item.email }}</td>
-            <td class="text-xs-center">{{ props.item.creationTime }}</td>
-            <td class="text-xs-center">{{ props.item.lastSignInTime }}</td>
-            <td class="text-xs-center">{{ props.item.isAdmin }}</td>
-            <td class="text-xs-center">{{ props.item.emailVerified }}</td>
-          </template>
-        </v-data-table>
-      </v-flex>
-    </v-layout>
-  </v-container>
+  <div>
+    <slot name="title"/>
+    <v-data-table
+      :headers="headers"
+      :items="items"
+      :loading="dataloading"
+      class="elevation-1 mt-2"
+    >
+      <template slot="headerCell" slot-scope="props">
+        <v-tooltip bottom>
+          <span slot="activator">
+            {{ props.header.text }}
+          </span>
+          <span>
+            {{ props.header.text }}
+          </span>
+        </v-tooltip>
+      </template>
+      <v-progress-linear slot="progress" :indeterminate="dataloading" color="blue"/>
+      <template slot="items" slot-scope="props">
+        <td class="text-xs-left">{{ props.item.displayName }}</td>
+        <td class="text-xs-left">{{ props.item.email }}</td>
+        <td class="text-xs-center">{{ props.item.creationTime }}</td>
+        <td class="text-xs-center">{{ props.item.lastSignInTime }}</td>
+        <td class="text-xs-center">{{ props.item.isAdmin }}</td>
+        <td class="text-xs-center">{{ props.item.emailVerified }}</td>
+      </template>
+    </v-data-table>
+  </div>
 </template>
 
 <script>
