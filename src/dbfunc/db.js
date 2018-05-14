@@ -22,7 +22,17 @@ db.settings({ timestampsInSnapshots: true });
 let storage = firebase.storage();
 
 // Functions
-function addUser(user, isAdmin) {
+
+function signInWithGoogleAuthProvider() {
+	var provider = new firebase.auth.GoogleAuthProvider();
+
+	provider.addScope("profile");
+	provider.addScope("email");
+
+	return firebase.auth().signInWithRedirect(provider);
+}
+
+function addUser(user, isAdmin, extproviderId) {
 	return new Promise((resolve, reject) => {
 		let userRef = db.collection("users").doc(user.uid);
 		userRef
@@ -32,7 +42,7 @@ function addUser(user, isAdmin) {
 				displayName: user.displayName,
 				photoURL: user.photoURL,
 				emailVerified: user.emailVerified,
-				providerId: user.providerId,
+				providerId: extproviderId !== undefined ? extproviderId : user.providerId,
 				creationTime: user.metadata.creationTime,
 				lastSignInTime: user.metadata.lastSignInTime,
 				isAdmin: isAdmin
@@ -40,7 +50,7 @@ function addUser(user, isAdmin) {
 			.then(() => {
 				userRef.collection("logins").add({
 					loginTime: user.metadata.lastSignInTime,
-					emailVerified: false,
+					emailVerified: user.emailVerified,
 					userip: store.state.ip,
 					country: store.state.ipdata.country_name,
 					city: store.state.ipdata.city,
@@ -75,14 +85,14 @@ function updateUserDisplayName(uid, displayName) {
 	);
 }
 
-function updateUserInfoWhenLogin(uid, emailVerified, lastSignInTime) {
+function updateUserInfoWhenLogin(user, lastSignInTime) {
 	return new Promise((resolve, reject) => {
-		let userRef = db.collection("users").doc(uid);
+		let userRef = db.collection("users").doc(user.uid);
 
 		userRef
 			.set(
 				{
-					emailVerified: emailVerified,
+					emailVerified: user.emailVerified,
 					lastSignInTime: lastSignInTime
 				},
 				{ merge: true }
@@ -90,7 +100,8 @@ function updateUserInfoWhenLogin(uid, emailVerified, lastSignInTime) {
 			.then(() => {
 				userRef.collection("logins").add({
 					loginTime: lastSignInTime,
-					emailVerified: emailVerified,
+					emailVerified: user.emailVerified,
+					providerId: user.providerId,
 					userip: store.state.ip,
 					country: store.state.ipdata.country_name,
 					city: store.state.ipdata.city,
@@ -114,6 +125,7 @@ export default {
 	storage,
 
 	// Functions
+	signInWithGoogleAuthProvider,
 	addUser,
 	updateUserPhotoURL,
 	updateUserDisplayName,

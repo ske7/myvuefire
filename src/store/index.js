@@ -123,7 +123,7 @@ export const store = new Vuex.Store({
 					.signInWithEmailAndPassword(payload.email, payload.password)
 					.then((user) => {
 						db
-							.updateUserInfoWhenLogin(user.uid, user.emailVerified, user.metadata.lastSignInTime)
+							.updateUserInfoWhenLogin(user, user.metadata.lastSignInTime)
 							.then(() => {
 								commit("setUser", {
 									uid: user.uid,
@@ -144,13 +144,22 @@ export const store = new Vuex.Store({
 					});
 			});
 		},
-		autoLogin({ commit }, payload) {
-			let lastSignInTime = new Date().toUTCString();
-			db
-				.updateUserInfoWhenLogin(payload.uid, payload.emailVerified, lastSignInTime)
-				.catch((error) => {
-					commit("setError", error);
-				});
+		autoLogin({ commit, state }, payload) {
+			db.auth.getRedirectResult().then((result) => {
+				if (result.user !== null) {
+					let user = result.user;
+					if (result.additionalUserInfo.isNewUser) {
+						db.addUser(user, state.confData.adminemail === user.email, result.additionalUserInfo.providerId);
+					} else {
+						db.updateUserInfoWhenLogin(user, user.metadata.lastSignInTime);
+					}
+				} else {
+					let lastSignInTime = new Date().toUTCString();
+					db.updateUserInfoWhenLogin(payload, lastSignInTime);
+				}
+			}).catch((error) => {
+				commit("setError", error);
+			});
 		},
 		authPreparing({ commit }, payload) {
 			commit("setAuthPreparing", false);
