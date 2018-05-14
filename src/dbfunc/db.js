@@ -22,7 +22,6 @@ db.settings({ timestampsInSnapshots: true });
 let storage = firebase.storage();
 
 // Functions
-
 function signInWithGoogleAuthProvider() {
 	var provider = new firebase.auth.GoogleAuthProvider();
 

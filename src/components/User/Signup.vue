@@ -59,10 +59,10 @@
                 </v-layout>
                 <v-layout row justify-center align-center>
                   <v-flex xs12 text-xs-center>
-                    <v-btn :disabled="signUpProcess" :loading="signUpProcess" type="submit" small dark color="purple">
+                    <v-btn :disabled="signUpProcess" :loading="signUpProcess" type="submit" small>
                       Sign up
                       <span slot="loader" class="custom-loader">
-                        <v-icon light>cached</v-icon>
+                        <v-icon dark>cached</v-icon>
                       </span>
                     </v-btn>
                   </v-flex>

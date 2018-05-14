@@ -100,6 +100,11 @@ export default {
 					} else {
 						this.$router.push("/");
 					}
+				}).catch((error) => {
+					this.$store.dispatch("logout").then(() => {
+						this.$store.commit("setLoading", false);
+						this.$store.commit("setError", error);
+					});
 				});
 			}
 		},

@@ -85,7 +85,8 @@ export const store = new Vuex.Store({
 
 				db.auth
 					.createUserWithEmailAndPassword(payload.email, payload.password)
-					.then((user) => {
+					.then((result) => {
+						let user = result.user;
 						user
 							.updateProfile({
 								displayName: payload.displayName
@@ -121,7 +122,8 @@ export const store = new Vuex.Store({
 
 				db.auth
 					.signInWithEmailAndPassword(payload.email, payload.password)
-					.then((user) => {
+					.then((result) => {
+						let user = result.user;
 						db
 							.updateUserInfoWhenLogin(user, user.metadata.lastSignInTime)
 							.then(() => {
@@ -138,8 +140,6 @@ export const store = new Vuex.Store({
 							});
 					})
 					.catch((error) => {
-						commit("setLoading", false);
-						commit("setError", error);
 						reject(error);
 					});
 			});
