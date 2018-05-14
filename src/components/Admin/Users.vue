@@ -23,6 +23,7 @@
         <td class="text-xs-left">{{ props.item.email }}</td>
         <td class="text-xs-center">{{ props.item.creationTime }}</td>
         <td class="text-xs-center">{{ props.item.lastSignInTime }}</td>
+        <td class="text-xs-center">{{ props.item.providerId }}</td>
         <td class="text-xs-center">{{ props.item.isAdmin }}</td>
         <td class="text-xs-center">{{ props.item.emailVerified }}</td>
       </template>
@@ -47,6 +48,7 @@ export default {
 				{ text: "Email", value: "email", align: "left" },
 				{ text: "Created", value: "creationTime", align: "center" },
 				{ text: "Signed In", value: "lastSignInTime", align: "center" },
+				{ text: "Provider", value: "providerId", align: "center" },
 				{ text: "Admin", value: "isAdmin", align: "center" },
 				{ text: "Email Verified", value: "emailVerified", align: "center" }
 			],
