@@ -185,7 +185,9 @@ export default {
 			});
 		},
 		onSignupWithFacebook() {
-			//
+			db.signInWithFacebookAuthProvider().catch((error) => {
+				this.$store.commit("setError", error);
+			});
 		},
 		onDismissed() {
 			this.$store.dispatch("clearError");

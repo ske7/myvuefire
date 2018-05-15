@@ -151,7 +151,7 @@ export const store = new Vuex.Store({
 					if (result.additionalUserInfo.isNewUser) {
 						db.addUser(user, state.confData.adminemail === user.email, result.additionalUserInfo.providerId);
 					} else {
-						db.updateUserInfoWhenLogin(user, user.metadata.lastSignInTime);
+						db.updateUserInfoWhenLogin(user, user.metadata.lastSignInTime, result.additionalUserInfo.providerId);
 					}
 				} else {
 					let lastSignInTime = new Date().toUTCString();
@@ -294,19 +294,21 @@ export const store = new Vuex.Store({
 				db.storage
 					.ref("profileImages/" + payload.userid + "/pImg_" + payload.userid + payload.ext)
 					.put(payload.image)
-					.then((filedata) => {
-						let currentUser = db.auth.currentUser;
-						currentUser
-							.updateProfile({
-								photoURL: filedata.metadata.downloadURLs[0]
-							})
-							.then(function() {
-								db
-									.updateUserPhotoURL(payload.userid, filedata.metadata.downloadURLs[0])
-									.then(() => {
-										resolve(filedata.metadata);
-									});
-							});
+					.then((snapshot) => {
+						snapshot.ref.getDownloadURL().then((url) => {
+							let currentUser = db.auth.currentUser;
+							currentUser
+								.updateProfile({
+									photoURL: url
+								})
+								.then(function() {
+									db
+										.updateUserPhotoURL(payload.userid, url)
+										.then(() => {
+											resolve(url);
+										});
+								});
+						});
 					})
 					.catch((error) => {
 						commit("setImgLoading", false);

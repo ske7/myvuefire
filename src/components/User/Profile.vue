@@ -459,9 +459,9 @@ export default {
 					userid: this.$store.getters.user.uid,
 					ext: extension,
 					image: file
-				}).then((metadata) => {
-					this.$store.commit("setUserPhotoURL", metadata.downloadURLs[0]);
-					this.photoURL = metadata.downloadURLs[0];
+				}).then((imageurl) => {
+					this.$store.commit("setUserPhotoURL", imageurl);
+					this.photoURL = imageurl;
 					this.$store.commit("setImgLoading", false);
 				});
 			}).catch((error) => {

@@ -41,11 +41,12 @@ store.commit("setAuthPreparing", true);
 
 store
 	.dispatch("getconfJSON")
-	.then((data) => {
-		store.commit("setConfData", data);
+	.then((confdata) => {
+		store.commit("setConfData", confdata);
 
 		db.auth.onAuthStateChanged(async function(user) {
 			if (store.state.signUpProcess) return false;
+
 			if (user) {
 				store.commit("setUser", {
 					uid: user.uid,

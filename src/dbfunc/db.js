@@ -23,10 +23,22 @@ let storage = firebase.storage();
 
 // Functions
 function signInWithGoogleAuthProvider() {
-	var provider = new firebase.auth.GoogleAuthProvider();
+	let provider = new firebase.auth.GoogleAuthProvider();
 
-	provider.addScope("profile");
 	provider.addScope("email");
+	provider.addScope("profile");
+
+	return firebase.auth().signInWithRedirect(provider);
+}
+
+function signInWithFacebookAuthProvider() {
+	let provider = new firebase.auth.FacebookAuthProvider();
+
+	provider.addScope("email");
+	provider.addScope("public_profile");
+	provider.setCustomParameters({
+		"display": "popup"
+	});
 
 	return firebase.auth().signInWithRedirect(provider);
 }
@@ -50,6 +62,7 @@ function addUser(user, isAdmin, extproviderId) {
 				userRef.collection("logins").add({
 					loginTime: user.metadata.lastSignInTime,
 					emailVerified: user.emailVerified,
+					providerId: extproviderId !== undefined ? extproviderId : user.providerId,
 					userip: store.state.ip,
 					country: store.state.ipdata.country_name,
 					city: store.state.ipdata.city,
@@ -84,7 +97,7 @@ function updateUserDisplayName(uid, displayName) {
 	);
 }
 
-function updateUserInfoWhenLogin(user, lastSignInTime) {
+function updateUserInfoWhenLogin(user, lastSignInTime, extproviderId) {
 	return new Promise((resolve, reject) => {
 		let userRef = db.collection("users").doc(user.uid);
 
@@ -100,7 +113,7 @@ function updateUserInfoWhenLogin(user, lastSignInTime) {
 				userRef.collection("logins").add({
 					loginTime: lastSignInTime,
 					emailVerified: user.emailVerified,
-					providerId: user.providerId,
+					providerId: extproviderId !== undefined ? extproviderId : user.providerId,
 					userip: store.state.ip,
 					country: store.state.ipdata.country_name,
 					city: store.state.ipdata.city,
@@ -125,6 +138,7 @@ export default {
 
 	// Functions
 	signInWithGoogleAuthProvider,
+	signInWithFacebookAuthProvider,
 	addUser,
 	updateUserPhotoURL,
 	updateUserDisplayName,
