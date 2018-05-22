@@ -1,7 +1,7 @@
 <template>
   <v-container>
     <v-layout row>
-      <v-flex xs12 sm6 offset-xs3>
+      <v-flex xs12 sm6 offset-sm3>
         <v-card class="blue-border-small" flat>
           <v-card-title primary-title class="headline justify-center">
             <div text-xs-center>Sign up with Email</div>
