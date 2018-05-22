@@ -64,12 +64,12 @@ function addUser(user, isAdmin, extproviderId) {
 					emailVerified: user.emailVerified,
 					providerId: extproviderId !== undefined ? extproviderId : user.providerId,
 					userip: store.state.ip,
-					country: store.state.ipdata.country_name,
-					city: store.state.ipdata.city,
-					timezone: store.state.ipdata.timezone,
-					utc_offset: store.state.ipdata.utc_offset,
-					latitude: store.state.ipdata.latitude,
-					longitude: store.state.ipdata.longitude
+					country: store.state.ipdata !== null ? store.state.ipdata.country_name : null,
+					city: store.state.ipdata !== null ? store.state.ipdata.city : null,
+					timezone: store.state.ipdata !== null ? store.state.ipdata.timezone : null,
+					utc_offset: store.state.ipdata !== null ? store.state.ipdata.utc_offset : null,
+					latitude: store.state.ipdata !== null ? store.state.ipdata.latitude : null,
+					longitude: store.state.ipdata !== null ? store.state.ipdata.longitude : null
 				});
 				resolve(userRef);
 			})
@@ -115,12 +115,12 @@ function updateUserInfoWhenLogin(user, lastSignInTime, extproviderId) {
 					emailVerified: user.emailVerified,
 					providerId: extproviderId !== undefined ? extproviderId : user.providerId,
 					userip: store.state.ip,
-					country: store.state.ipdata.country_name,
-					city: store.state.ipdata.city,
-					timezone: store.state.ipdata.timezone,
-					utc_offset: store.state.ipdata.utc_offset,
-					latitude: store.state.ipdata.latitude,
-					longitude: store.state.ipdata.longitude
+					country: store.state.ipdata !== null ? store.state.ipdata.country_name : null,
+					city: store.state.ipdata !== null ? store.state.ipdata.city : null,
+					timezone: store.state.ipdata !== null ? store.state.ipdata.timezone : null,
+					utc_offset: store.state.ipdata !== null ? store.state.ipdata.utc_offset : null,
+					latitude: store.state.ipdata !== null ? store.state.ipdata.latitude : null,
+					longitude: store.state.ipdata !== null ? store.state.ipdata.longitude : null
 				});
 				resolve(userRef);
 			})
