@@ -16,7 +16,6 @@ export const store = new Vuex.Store({
 		loading3: false,
 		signUpProcess: false,
 		imgloading: false,
-		authpreparing: true,
 		error: null,
 		confData: null,
 		ip: "0.0.0.0",
@@ -42,9 +41,6 @@ export const store = new Vuex.Store({
 		setImgLoading(state, payload) {
 			state.imgloading = payload;
 		},
-		setAuthPreparing(state, payload) {
-			state.authpreparing = payload;
-		},
 		setError(state, payload) {
 			state.error = payload;
 		},
@@ -64,15 +60,9 @@ export const store = new Vuex.Store({
 			state.user.displayName = payload;
 		},
 		setUserIP(state, payload) {
-			if (state.user) {
-				state.user.ip = payload;
-			}
 			state.ip = payload;
 		},
 		setUserIPData(state, payload) {
-			if (state.user) {
-				state.user.ipdata = payload;
-			}
 			state.ipdata = payload;
 		}
 	},
@@ -145,24 +135,17 @@ export const store = new Vuex.Store({
 			});
 		},
 		autoLogin({ commit, state }, payload) {
-			db.auth.getRedirectResult().then((result) => {
-				if (result.user !== null) {
-					let user = result.user;
-					if (result.additionalUserInfo.isNewUser) {
-						db.addUser(user, state.confData.adminemail === user.email, result.additionalUserInfo.providerId);
-					} else {
-						db.updateUserInfoWhenLogin(user, user.metadata.lastSignInTime, result.additionalUserInfo.providerId);
-					}
+			if (payload.redirectResult.user !== null) {
+				let user = payload.redirectResult.user;
+				if (payload.redirectResult.additionalUserInfo.isNewUser) {
+					db.addUser(user, state.confData.adminemail === user.email, payload.redirectResult.additionalUserInfo.providerId);
 				} else {
-					let lastSignInTime = new Date().toUTCString();
-					db.updateUserInfoWhenLogin(payload, lastSignInTime);
+					db.updateUserInfoWhenLogin(user, user.metadata.lastSignInTime, payload.redirectResult.additionalUserInfo.providerId);
 				}
-			}).catch((error) => {
-				commit("setError", error);
-			});
-		},
-		authPreparing({ commit }, payload) {
-			commit("setAuthPreparing", false);
+			} else {
+				const lastSignInTime = new Date().toUTCString();
+				db.updateUserInfoWhenLogin(payload.user, lastSignInTime);
+			}
 		},
 		logout({ commit }) {
 			return new Promise((resolve, reject) => {
@@ -366,9 +349,6 @@ export const store = new Vuex.Store({
 		},
 		signUpProcess(state) {
 			return state.signUpProcess;
-		},
-		authpreparing(state) {
-			return state.authpreparing;
 		},
 		error(state) {
 			return state.error;
