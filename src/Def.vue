@@ -9,21 +9,39 @@
         <v-container>
           <transition name="fade" mode="out-in">
             <v-layout row justify-center align-center>
-              <v-flex xs12 text-xs-center>
+              <v-flex xs8 text-xs-center>
                 <v-alert :value="true" :color="isError ? 'error' : 'info'" :type="isError ? 'error' : 'info'">
                   <v-layout row justify-center align-centerp class="display-1">{{ headerText }}</v-layout>
-                  <v-layout v-if="isError" row justify-center wrap align-center class="body-1 mt-3">
-                    <v-flex xs12 text-xs-center>{{ errorCode ? errorCode + ': ' : '' }} {{ errorText }} </v-flex>
+                  <v-layout v-if="isError && errorCode" row justify-center wrap align-center class="body-1 mt-3">
+                    <v-flex xs8 text-xs-left>Error code: {{ errorCode }} </v-flex>
                   </v-layout>
-                  <v-layout v-if="isLoading" row justify-center align-center wrap><v-progress-circular :size="40" indeterminate color="white"/></v-layout>
+                  <v-layout v-if="isError" row justify-center wrap align-center class="body-1 mt-1">
+                    <v-flex xs8 text-xs-left>Error message: {{ errorText }} </v-flex>
+                  </v-layout>
+                  <v-layout v-if="isLoading" row justify-center align-center mt-1><v-progress-circular :size="40" indeterminate color="white"/></v-layout>
                   <v-layout row justify-center align-center mt-3>
                     <v-btn
                       v-if="isError"
                       color="yellow"
                       light
+                      small
                       style="min-width:48px; max-width:96px;"
                       @click="reload()">
                       Reload
+                    </v-btn>
+                  </v-layout>
+                  <v-layout v-if="isGoogleSignIn" row justify-center align-center>
+                    <v-btn
+                      small
+                      color="white"
+                      light
+                      round
+                      @click="onSignupWithGoogle">
+                      <i class="fa fa-google-plus"/>
+                      <span class="ml-1">Sign in with Google</span>
+                      <span slot="loader" class="custom-loader">
+                        <v-icon light>cached</v-icon>
+                      </span>
                     </v-btn>
                   </v-layout>
                 </v-alert>
@@ -40,6 +58,7 @@
 <script>
 import DefHeader from "./components/DefHeader.vue";
 import Footer from "./components/Footer.vue";
+import db from "@/dbfunc/db";
 
 export default {
 	name: "Def",
@@ -56,6 +75,11 @@ export default {
 		isError() {
 			return (
 				this.$store.getters.isError
+			);
+		},
+		isGoogleSignIn() {
+			return (
+				this.$store.getters.errorMode === "googleSignIn"
 			);
 		},
 		headerText() {
@@ -77,6 +101,11 @@ export default {
 	methods: {
 		reload() {
 			location.reload();
+		},
+		onSignupWithGoogle() {
+			db.signInWithGoogleAuthProvider().catch((error) => {
+				alert(error);
+			});
 		}
 	}
 };

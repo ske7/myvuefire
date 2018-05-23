@@ -137,6 +137,20 @@ export const store = new Vuex.Store({
 		autoLogin({ commit, state }, payload) {
 			if (payload.redirectResult.user !== null) {
 				let user = payload.redirectResult.user;
+
+				/* todo linkAndRetrieveDataWithCredential
+				const firebaseErrorAuthCredential = localStorage.getItem("firebaseErrorAuthCredential");
+				if (firebaseErrorAuthCredential !== null) {
+					let cred = JSON.parse(firebaseErrorAuthCredential);
+					try {
+						user.linkAndRetrieveDataWithCredential(cred).then((userCredential) => {
+							console.log(3, userCredential);
+						});
+					} finally {
+						localStorage.removeItem("firebaseErrorAuthCredential");
+					}
+				} */
+
 				if (payload.redirectResult.additionalUserInfo.isNewUser) {
 					db.addUser(user, state.confData.adminemail === user.email, payload.redirectResult.additionalUserInfo.providerId);
 				} else {

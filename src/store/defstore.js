@@ -10,7 +10,8 @@ export const defstore = new Vuex.Store({
 		isLoading: true,
 		isError: false,
 		errorText: "",
-		errorCode: ""
+		errorCode: "",
+		errorMode: ""
 	},
 
 	mutations: {
@@ -24,6 +25,9 @@ export const defstore = new Vuex.Store({
 			if (payload.errorCode !== undefined) {
 				state.errorCode = payload.errorCode;
 			}
+			if (payload.errorMode !== undefined) {
+				state.errorMode = payload.errorMode;
+			}
 		}
 	},
 
@@ -33,6 +37,9 @@ export const defstore = new Vuex.Store({
 		},
 		isError(state) {
 			return state.isError;
+		},
+		errorMode(state) {
+			return state.errorMode;
 		}
 	}
 });

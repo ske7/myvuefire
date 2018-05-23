@@ -4,7 +4,7 @@
       <v-flex xs12 sm6 offset-sm3>
         <v-card class="blue-border-small" flat>
           <v-card-title primary-title class="headline justify-center">
-            <div text-xs-center>Log in to your account</div>
+            <div text-xs-center>Sign in</div>
           </v-card-title>
           <v-card-text>
             <v-container>
@@ -35,26 +35,59 @@
                 </v-layout>
                 <v-layout row justify-center align-center>
                   <v-flex xs12 text-xs-center>
-                    <v-btn :disabled="loading" :loading="loading" type="submit">
-                      Log in
+                    <v-btn :disabled="loading" :loading="loading" type="submit" small color="orange accent-1" light>
+                      <div text-xs-center>Sign in with Email</div>
                       <span slot="loader" class="custom-loader">
                         <v-icon light>cached</v-icon>
                       </span>
                     </v-btn>
                   </v-flex>
                 </v-layout>
-                <v-layout row>
-                  <v-flex xs12 text-xs-center mt-2>
-                    <router-link to="/reset">Forgot your password?</router-link>
-                  </v-flex>
-                </v-layout>
-                <v-layout row>
-                  <v-flex xs12 text-xs-center mt-2>
-                    Don't have an account?
-                    <router-link to="/signup"> Sign up</router-link>
-                  </v-flex>
-                </v-layout>
               </v-form>
+              <v-layout row>
+                <v-flex xs12 text-xs-center mt-1 mb-1 body-2>
+                  or
+                </v-flex>
+              </v-layout>
+              <v-layout row justify-center align-center>
+                <v-flex text-xs-center>
+                  <v-btn
+                    small
+                    color="red"
+                    dark
+                    round
+                    @click="onSignupWithGoogle">
+                    <i class="fa fa-google-plus"/>
+                    <span class="ml-1">Sign in with Google</span>
+                    <span slot="loader" class="custom-loader">
+                      <v-icon light>cached</v-icon>
+                    </span>
+                  </v-btn>
+                  <v-btn
+                    small
+                    color="blue darken-4"
+                    dark
+                    round
+                    @click="onSignupWithFacebook">
+                    <i class="fa fa-facebook-f"/>
+                    <span class="ml-1">Sign in with Facebook</span>
+                    <span slot="loader" class="custom-loader">
+                      <v-icon light>cached</v-icon>
+                    </span>
+                  </v-btn>
+                </v-flex>
+              </v-layout>
+              <v-layout row>
+                <v-flex xs12 text-xs-center mt-2>
+                  <router-link to="/reset">Forgot your password?</router-link>
+                </v-flex>
+              </v-layout>
+              <v-layout row>
+                <v-flex xs12 text-xs-center mt-2>
+                  Don't have an account?
+                  <router-link to="/signup"> Sign up</router-link>
+                </v-flex>
+              </v-layout>
             </v-container>
           </v-card-text>
         </v-card>
@@ -69,6 +102,8 @@
 </template>
 
 <script>
+import db from "@/dbfunc/db";
+
 export default {
 	name: "Login",
 	data() {
@@ -107,6 +142,16 @@ export default {
 					});
 				});
 			}
+		},
+		onSignupWithGoogle() {
+			db.signInWithGoogleAuthProvider().catch((error) => {
+				this.$store.commit("setError", error);
+			});
+		},
+		onSignupWithFacebook() {
+			db.signInWithFacebookAuthProvider().catch((error) => {
+				this.$store.commit("setError", error);
+			});
 		},
 		onDismissed() {
 			this.$store.dispatch("clearError");

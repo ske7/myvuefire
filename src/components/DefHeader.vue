@@ -15,6 +15,7 @@
     </v-toolbar-title>
     <v-spacer/>
     <v-btn
+      v-show="false"
       small
       color="green darken-1"
       class="text-xs-center"
@@ -24,6 +25,7 @@
       <span class="ml-2 hidden-xs-only">Login</span>
     </v-btn>
     <v-btn
+      v-show="false"
       small
       color="primary"
       class="text-xs-center"
@@ -32,7 +34,6 @@
       <i class="fa fa-thumbs-up"/>
       <span class="ml-2 hidden-xs-only">Sign up</span>
     </v-btn>
-    <p/>
   </v-toolbar>
 </template>
 

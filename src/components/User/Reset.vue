@@ -23,7 +23,7 @@
                 </v-layout>
                 <v-layout row justify-center align-center>
                   <v-flex xs12 text-xs-center>
-                    <v-btn :disabled="loading || passwordResetEmailSent" :loading="loading" type="submit">
+                    <v-btn :disabled="loading || passwordResetEmailSent" :loading="loading" type="submit" small color="orange accent-1" light>
                       Send
                       <span slot="loader" class="custom-loader">
                         <v-icon light>cached</v-icon>

@@ -59,7 +59,7 @@
                 </v-layout>
                 <v-layout row justify-center align-center>
                   <v-flex xs12 text-xs-center>
-                    <v-btn :disabled="signUpProcess" :loading="signUpProcess" type="submit" small>
+                    <v-btn :disabled="signUpProcess" :loading="signUpProcess" type="submit" small color="orange accent-1" light>
                       Sign up
                       <span slot="loader" class="custom-loader">
                         <v-icon dark>cached</v-icon>
@@ -69,42 +69,9 @@
                 </v-layout>
               </v-form>
               <v-layout row>
-                <v-flex xs12 text-xs-center mt-1 body-2>
-                  Or
-                </v-flex>
-              </v-layout>
-              <v-layout row justify-center align-center>
-                <v-flex text-xs-center>
-                  <v-btn
-                    small
-                    color="red"
-                    dark
-                    round
-                    @click="onSignupWithGoogle">
-                    <i class="fa fa-google-plus"/>
-                    <span class="ml-1">Sign in with Google</span>
-                    <span slot="loader" class="custom-loader">
-                      <v-icon light>cached</v-icon>
-                    </span>
-                  </v-btn>
-                  <v-btn
-                    small
-                    color="blue darken-4"
-                    dark
-                    round
-                    @click="onSignupWithFacebook">
-                    <i class="fa fa-facebook-f"/>
-                    <span class="ml-1">Sign in with Facebook</span>
-                    <span slot="loader" class="custom-loader">
-                      <v-icon light>cached</v-icon>
-                    </span>
-                  </v-btn>
-                </v-flex>
-              </v-layout>
-              <v-layout row>
-                <v-flex xs12 text-xs-center mt-1>
+                <v-flex xs12 text-xs-center mt-3>
                   Already have an account?
-                  <router-link to="/login"> Log in</router-link>
+                  <router-link to="/login"> Sign in</router-link>
                 </v-flex>
               </v-layout>
             </v-container>
@@ -121,8 +88,6 @@
 </template>
 
 <script>
-import db from "@/dbfunc/db";
-
 export default {
 	name: "Signup",
 	data() {
@@ -177,16 +142,6 @@ export default {
 						this.$store.commit("setError", error);
 					});
 				}
-			});
-		},
-		onSignupWithGoogle() {
-			db.signInWithGoogleAuthProvider().catch((error) => {
-				this.$store.commit("setError", error);
-			});
-		},
-		onSignupWithFacebook() {
-			db.signInWithFacebookAuthProvider().catch((error) => {
-				this.$store.commit("setError", error);
 			});
 		},
 		onDismissed() {
