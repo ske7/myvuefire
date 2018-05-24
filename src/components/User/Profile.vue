@@ -20,7 +20,8 @@
                       :loading="loading2"
                       small
                       style="min-width:48px;"
-                      color="accent"
+                      color="blue darken-4"
+                      dark
                       @click.native="onEmailVerification()">
                       <span slot="loader" class="custom-loader">
                         <v-icon light>cached</v-icon>
@@ -119,18 +120,46 @@
               </v-layout>
               <v-layout row justify-center align-center>
                 <v-flex xs12 text-xs-center>
-                  <v-btn :disabled="loading || !needToUpdate" :loading="loading" style="max-width:150px;" type="submit" @click.native="onUpdateProfile()">
+                  <v-btn
+                    :disabled="loading || !needToUpdate"
+                    :loading="loading"
+                    style="max-width:150px;"
+                    type="submit"
+                    small
+                    color="orange accent-1"
+                    light
+                    @click.native="onUpdateProfile()">
                     Update profile
                     <span slot="loader" class="custom-loader">
                       <v-icon light>cached</v-icon>
                     </span>
                   </v-btn>
-                  <v-btn :disabled="loading3 || !needToChangePassword" :loading="loading3" style="max-width:150px;" @click.native="onChangePassword()">
+                  <v-btn
+                    :disabled="loading3 || !needToChangePassword"
+                    :loading="loading3"
+                    style="max-width:150px;"
+                    small
+                    color="orange accent-1"
+                    light
+                    @click.native="onChangePassword()">
                     Change password
                     <span slot="loader" class="custom-loader">
                       <v-icon light>cached</v-icon>
                     </span>
                   </v-btn>
+                  <v-tooltip bottom open-delay="500">
+                    <v-btn
+                      slot="activator"
+                      style="max-width:120px;min-width:32px"
+                      small
+                      color="red darken-1"
+                      class="text-xs-left"
+                      dark
+                      @click.native="onChooseToEraseProfile()">
+                      <v-icon dark>delete</v-icon>
+                    </v-btn>
+                    <span>Delete profile</span>
+                  </v-tooltip>
                 </v-flex>
               </v-layout>
             </v-form>
@@ -138,7 +167,7 @@
         </v-card>
       </v-flex>
     </v-layout>
-    <v-layout v-if="profileUpdated || passwordChanged || verificationEmailSent || needToVerify" row justify-center align-center>
+    <v-layout v-if="(profileUpdated || passwordChanged || verificationEmailSent || needToVerify) && !error" row justify-center align-center>
       <v-flex xs12 sm6>
         <v-alert :value="true" :color="alertColor" outline type="info">
           {{ alertUpdateText }}
@@ -188,14 +217,26 @@
         </v-layout>
       </v-card>
     </v-dialog>
+    <keep-alive>
+      <yesnowithtimedialog
+        :toggle="profileEraseDialog"
+        :initcounter="3"
+        question="A you certainly want to erase your profile?"
+        @cancel-dialog="profileEraseDialog = false"
+        @accept-question="onEraseProfile()"/>
+    </keep-alive>
   </v-container>
 </template>
 
 <script>
 import db from "@/dbfunc/db";
+import YesNoWithTimeDialog from "@/components/Common/YesNoWithTimeDialog";
 
 export default {
 	name: "Profile",
+	components: {
+		"yesnowithtimedialog": YesNoWithTimeDialog
+	},
 	data() {
 		return {
 			email: "",
@@ -218,6 +259,7 @@ export default {
 			relogindialog: false,
 			relogindialog2: false,
 			profimgdeletedialog: false,
+			profileEraseDialog: false,
 			needToVerify: false,
 			verifiedStyle: {
 				color: "green",
@@ -255,7 +297,7 @@ export default {
 			return (this.oldDisplayName !== this.displayName);
 		},
 		needToChangePassword() {
-			return (this.password !== "") && !this.alreadyChangePassword;
+			return (this.password !== "") && (this.confirmPassword !== "") && !this.alreadyChangePassword;
 		},
 		profileImg() {
 			if (this.photoURL) {
@@ -322,6 +364,14 @@ export default {
 					this.setUpdatedFlagsToFalse();
 				}
 			);
+		},
+		onChooseToEraseProfile() {
+			this.profileEraseDialog = true;
+		},
+		onEraseProfile() {
+			this.profileEraseDialog = false;
+			alert("Erased!");
+			// todo
 		},
 		onChangePassword() {
 			if (this.$refs.form.validate()) {
