@@ -6,6 +6,7 @@
 
 <script>
 export default {
+	name: "AlertCommon",
 	props: {
 		text: {
 			type: String,
