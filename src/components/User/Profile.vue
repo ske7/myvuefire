@@ -217,6 +217,15 @@
         </v-layout>
       </v-card>
     </v-dialog>
+    <v-dialog v-model="isWorking" max-width="150" persistent transition="fade-transition">
+      <v-card>
+        <v-layout row justify-center align-center>
+          <v-card-title class="subheading text-xs-center">Working...
+            <v-progress-circular :size="20" indeterminate color="green"/>
+          </v-card-title>
+        </v-layout>
+      </v-card>
+    </v-dialog>
     <keep-alive>
       <yesnowithtimedialog
         :toggle="profileEraseDialog"
@@ -289,6 +298,9 @@ export default {
 		},
 		loading3() {
 			return this.$store.getters.loading3;
+		},
+		isWorking() {
+			return this.$store.getters.isWorking;
 		},
 		imgloading() {
 			return this.$store.getters.imgloading;
@@ -370,8 +382,13 @@ export default {
 		},
 		onEraseProfile() {
 			this.profileEraseDialog = false;
-			alert("Erased!");
-			// todo
+			this.$store.dispatch("eraseProfile").then(() => {
+				this.$router.push("/");
+			}).then(() => {
+				this.$store.commit("setUser", null);
+			}).catch((error) => {
+				this.$store.commit("setError", error);
+			});
 		},
 		onChangePassword() {
 			if (this.$refs.form.validate()) {

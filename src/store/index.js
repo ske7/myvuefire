@@ -19,7 +19,8 @@ export const store = new Vuex.Store({
 		error: null,
 		confData: null,
 		ip: "0.0.0.0",
-		ipdata: null
+		ipdata: null,
+		isWorking: false
 	},
 
 	mutations: {
@@ -34,6 +35,9 @@ export const store = new Vuex.Store({
 		},
 		setLoading3(state, payload) {
 			state.loading3 = payload;
+		},
+		setIsWorking(state, payload) {
+			state.isWorking = payload;
 		},
 		setSignUpProcess(state, payload) {
 			state.signUpProcess = payload;
@@ -342,6 +346,37 @@ export const store = new Vuex.Store({
 						reject(error);
 					});
 			});
+		},
+		eraseProfile({ commit, state }) {
+			return new Promise((resolve, reject) => {
+				commit("setIsWorking", true);
+				commit("clearError");
+
+				try {
+					if (state.user === null) {
+						throw new Error("There is no logged user!");
+					}
+					let currentUser = db.auth.currentUser;
+					if (currentUser.uid !== state.user.uid) {
+						throw new Error("uid values mismatch");
+					}
+
+					db.deleteCollection(`/users/${state.user.uid}/logins`, 5).then(() => {
+						db.db.collection("users").doc(state.user.uid).delete().then(() => {
+							currentUser.delete().then(() => {
+								commit("setIsWorking", false);
+								resolve();
+							}).catch((error) => {
+								commit("setIsWorking", false);
+								reject(error);
+							});
+						});
+					});
+				} catch (error) {
+					commit("setIsWorking", false);
+					reject(error);
+				}
+			});
 		}
 	},
 
@@ -357,6 +392,9 @@ export const store = new Vuex.Store({
 		},
 		loading3(state) {
 			return state.loading3;
+		},
+		isWorking(state) {
+			return state.isWorking;
 		},
 		imgloading(state) {
 			return state.imgloading;

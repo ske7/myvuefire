@@ -130,6 +130,45 @@ function updateUserInfoWhenLogin(user, lastSignInTime, extproviderId) {
 	});
 }
 
+function deleteCollection(collectionPath, batchSize) {
+	let collectionRef = db.collection(collectionPath);
+	let query = collectionRef.limit(batchSize);
+
+	return new Promise((resolve, reject) => {
+		deleteQueryBatch(query, batchSize, resolve, reject);
+	});
+}
+
+function deleteQueryBatch(query, batchSize, resolve, reject) {
+	query.get()
+		.then((snapshot) => {
+			// When there are no documents left, we are done
+			if (snapshot.size === 0) {
+				return 0;
+			}
+
+			// Delete documents in a batch
+			let batch = db.batch();
+			snapshot.docs.forEach((doc) => {
+				batch.delete(doc.ref);
+			});
+
+			return batch.commit().then(() => {
+				return snapshot.size;
+			});
+		}).then((numDeleted) => {
+			if (numDeleted === 0) {
+				resolve();
+				return;
+			}
+
+			process.nextTick(() => {
+				deleteQueryBatch(query, batchSize, resolve, reject);
+			});
+		})
+		.catch(reject);
+}
+
 // ------------------------------------- //
 export default {
 	auth,
@@ -142,5 +181,7 @@ export default {
 	addUser,
 	updateUserPhotoURL,
 	updateUserDisplayName,
-	updateUserInfoWhenLogin
+	updateUserInfoWhenLogin,
+	deleteCollection,
+	deleteQueryBatch
 };
