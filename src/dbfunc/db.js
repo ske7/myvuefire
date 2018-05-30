@@ -17,8 +17,8 @@ let config = {
 };
 let app = firebase.initializeApp(config);
 let auth = firebase.auth(app);
-let db = firebase.firestore(app);
-db.settings({ timestampsInSnapshots: true });
+let firestore = firebase.firestore(app);
+firestore.settings({ timestampsInSnapshots: true });
 let storage = firebase.storage();
 
 // Functions
@@ -43,9 +43,17 @@ function signInWithFacebookAuthProvider() {
 	return firebase.auth().signInWithRedirect(provider);
 }
 
+function signInWithGithubAuthProvider() {
+	let provider = new firebase.auth.GithubAuthProvider();
+
+	provider.addScope("repo");
+
+	return firebase.auth().signInWithRedirect(provider);
+}
+
 function addUser(user, isAdmin, extproviderId) {
 	return new Promise((resolve, reject) => {
-		let userRef = db.collection("users").doc(user.uid);
+		let userRef = firestore.collection("users").doc(user.uid);
 		userRef
 			.set({
 				uid: user.uid,
@@ -80,7 +88,7 @@ function addUser(user, isAdmin, extproviderId) {
 }
 
 function updateUserPhotoURL(uid, photoURL) {
-	return db.collection("users").doc(uid).set(
+	return firestore.collection("users").doc(uid).set(
 		{
 			photoURL: photoURL
 		},
@@ -89,7 +97,7 @@ function updateUserPhotoURL(uid, photoURL) {
 }
 
 function updateUserDisplayName(uid, displayName) {
-	return db.collection("users").doc(uid).set(
+	return firestore.collection("users").doc(uid).set(
 		{
 			displayName: displayName
 		},
@@ -99,7 +107,7 @@ function updateUserDisplayName(uid, displayName) {
 
 function updateUserInfoWhenLogin(user, lastSignInTime, extproviderId) {
 	return new Promise((resolve, reject) => {
-		let userRef = db.collection("users").doc(user.uid);
+		let userRef = firestore.collection("users").doc(user.uid);
 
 		userRef
 			.set(
@@ -131,7 +139,7 @@ function updateUserInfoWhenLogin(user, lastSignInTime, extproviderId) {
 }
 
 function deleteCollection(collectionPath, batchSize) {
-	let collectionRef = db.collection(collectionPath);
+	let collectionRef = firestore.collection(collectionPath);
 	let query = collectionRef.limit(batchSize);
 
 	return new Promise((resolve, reject) => {
@@ -148,7 +156,7 @@ function deleteQueryBatch(query, batchSize, resolve, reject) {
 			}
 
 			// Delete documents in a batch
-			let batch = db.batch();
+			let batch = firestore.batch();
 			snapshot.docs.forEach((doc) => {
 				batch.delete(doc.ref);
 			});
@@ -171,13 +179,15 @@ function deleteQueryBatch(query, batchSize, resolve, reject) {
 
 // ------------------------------------- //
 export default {
+	firebase,
 	auth,
-	db,
+	firestore,
 	storage,
 
 	// Functions
 	signInWithGoogleAuthProvider,
 	signInWithFacebookAuthProvider,
+	signInWithGithubAuthProvider,
 	addUser,
 	updateUserPhotoURL,
 	updateUserDisplayName,

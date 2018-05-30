@@ -142,18 +142,24 @@ export const store = new Vuex.Store({
 			if (payload.redirectResult.user !== null) {
 				let user = payload.redirectResult.user;
 
-				/* todo linkAndRetrieveDataWithCredential
 				const firebaseErrorAuthCredential = localStorage.getItem("firebaseErrorAuthCredential");
 				if (firebaseErrorAuthCredential !== null) {
-					let cred = JSON.parse(firebaseErrorAuthCredential);
+					let credErr = JSON.parse(firebaseErrorAuthCredential);
+					let cred = null;
+					if (credErr.providerId === "github.com") {
+						cred = db.firebase.auth.GithubAuthProvider.credential(credErr.accessToken);
+					} else if (credErr.providerId === "facebook.com") {
+						cred = db.firebase.auth.FacebookAuthProvider.credential(credErr.accessToken);
+					}
+
 					try {
-						user.linkAndRetrieveDataWithCredential(cred).then((userCredential) => {
-							console.log(3, userCredential);
-						});
+						if (cred !== null) {
+							user.linkAndRetrieveDataWithCredential(cred);
+						}
 					} finally {
 						localStorage.removeItem("firebaseErrorAuthCredential");
 					}
-				} */
+				}
 
 				if (payload.redirectResult.additionalUserInfo.isNewUser) {
 					db.addUser(user, state.confData.adminemail === user.email, payload.redirectResult.additionalUserInfo.providerId);
@@ -362,7 +368,7 @@ export const store = new Vuex.Store({
 					}
 
 					db.deleteCollection(`/users/${state.user.uid}/logins`, 5).then(() => {
-						db.db.collection("users").doc(state.user.uid).delete().then(() => {
+						db.firestore.collection("users").doc(state.user.uid).delete().then(() => {
 							currentUser.delete().then(() => {
 								commit("setIsWorking", false);
 								resolve();

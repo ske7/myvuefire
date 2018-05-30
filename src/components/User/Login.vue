@@ -75,6 +75,18 @@
                       <v-icon light>cached</v-icon>
                     </span>
                   </v-btn>
+                  <v-btn
+                    small
+                    color="grey darken-4"
+                    dark
+                    round
+                    @click="onSignupWithGithub">
+                    <i class="fa fa-github"/>
+                    <span class="ml-1">Sign in with Github</span>
+                    <span slot="loader" class="custom-loader">
+                      <v-icon light>cached</v-icon>
+                    </span>
+                  </v-btn>
                 </v-flex>
               </v-layout>
               <v-layout row>
@@ -150,6 +162,11 @@ export default {
 		},
 		onSignupWithFacebook() {
 			db.signInWithFacebookAuthProvider().catch((error) => {
+				this.$store.commit("setError", error);
+			});
+		},
+		onSignupWithGithub() {
+			db.signInWithGithubAuthProvider().catch((error) => {
 				this.$store.commit("setError", error);
 			});
 		},

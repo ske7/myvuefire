@@ -72,7 +72,7 @@ db.auth.onAuthStateChanged(async function(user) {
 				await db.auth.fetchSignInMethodsForEmail(error.email).then((signMethods) => {
 					if (signMethods.indexOf("google.com") !== -1) {
 						errorMode = "googleSignIn";
-						// localStorage.setItem("firebaseErrorAuthCredential", JSON.stringify(error.credential));
+						localStorage.setItem("firebaseErrorAuthCredential", JSON.stringify(error.credential));
 					}
 				});
 			}

@@ -58,7 +58,7 @@ export default {
 	created() {
 		this.dataloading = true;
 		let arr = [];
-		db.db.collection("users").get().then((querySnapshot) => {
+		db.firestore.collection("users").get().then((querySnapshot) => {
 			querySnapshot.forEach((doc) => {
 				arr = doc.data();
 				let arr2 = {};
