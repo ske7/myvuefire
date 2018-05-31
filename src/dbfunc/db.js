@@ -51,6 +51,12 @@ function signInWithGithubAuthProvider() {
 	return firebase.auth().signInWithRedirect(provider);
 }
 
+function signInWithTwitterAuthProvider() {
+	let provider = new firebase.auth.TwitterAuthProvider();
+
+	return firebase.auth().signInWithRedirect(provider);
+}
+
 function addUser(user, isAdmin, extproviderId) {
 	return new Promise((resolve, reject) => {
 		let userRef = firestore.collection("users").doc(user.uid);
@@ -150,12 +156,10 @@ function deleteCollection(collectionPath, batchSize) {
 function deleteQueryBatch(query, batchSize, resolve, reject) {
 	query.get()
 		.then((snapshot) => {
-			// When there are no documents left, we are done
 			if (snapshot.size === 0) {
 				return 0;
 			}
 
-			// Delete documents in a batch
 			let batch = firestore.batch();
 			snapshot.docs.forEach((doc) => {
 				batch.delete(doc.ref);
@@ -164,7 +168,8 @@ function deleteQueryBatch(query, batchSize, resolve, reject) {
 			return batch.commit().then(() => {
 				return snapshot.size;
 			});
-		}).then((numDeleted) => {
+		})
+		.then((numDeleted) => {
 			if (numDeleted === 0) {
 				resolve();
 				return;
@@ -188,6 +193,7 @@ export default {
 	signInWithGoogleAuthProvider,
 	signInWithFacebookAuthProvider,
 	signInWithGithubAuthProvider,
+	signInWithTwitterAuthProvider,
 	addUser,
 	updateUserPhotoURL,
 	updateUserDisplayName,

@@ -388,6 +388,9 @@ export default {
 				this.$store.commit("setUser", null);
 			}).catch((error) => {
 				this.$store.commit("setError", error);
+				if (error.code === "auth/requires-recent-login") {
+					this.relogindialog = true;
+				}
 			});
 		},
 		onChangePassword() {

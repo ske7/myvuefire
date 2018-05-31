@@ -52,26 +52,36 @@ db.auth.onAuthStateChanged(async function(user) {
 	try {
 		if (store.state.signUpProcess) return false;
 
-		await store.dispatch("getconfJSON").then((confdata) => {
-			store.commit("setConfData", confdata);
-		}).catch((error) => {
-			if (error.message === "Request failed with status code 404") {
-				defstore.commit("setError", {errorText: "conf.json not found" + ":" + JSON.stringify(error.response), errorCode: "er101"});
-			} else {
-				defstore.commit("setError", {errorText: error, errorCode: "er100"});
-			}
-		});
-		if (defstore.state.isError) return false;
+		if (user) {
+			await store.dispatch("getconfJSON").then((confdata) => {
+				store.commit("setConfData", confdata);
+			}).catch((error) => {
+				if (error.message === "Request failed with status code 404") {
+					defstore.commit("setError", {errorText: "conf.json not found" + ":" + JSON.stringify(error.response), errorCode: "er101"});
+				} else {
+					defstore.commit("setError", {errorText: error, errorCode: "er100"});
+				}
+			});
+			if (defstore.state.isError) return false;
+		}
 
 		let redirectResult;
 		await db.auth.getRedirectResult().then((result) => {
 			redirectResult = result;
 		}).catch(async(error) => {
-			let errorMode;
+			let errorMode = "";
 			if (error.code === "auth/account-exists-with-different-credential") {
 				await db.auth.fetchSignInMethodsForEmail(error.email).then((signMethods) => {
 					if (signMethods.indexOf("google.com") !== -1) {
 						errorMode = "googleSignIn";
+					} else if (signMethods.indexOf("facebook.com") !== -1) {
+						errorMode = "facebookSignIn";
+					} else if (signMethods.indexOf("twitter.com") !== -1) {
+						errorMode = "twitterSignIn";
+					} else if (signMethods.indexOf("github.com") !== -1) {
+						errorMode = "githubSignIn";
+					}
+					if (errorMode !== "") {
 						localStorage.setItem("firebaseErrorAuthCredential", JSON.stringify(error.credential));
 					}
 				});
@@ -92,18 +102,19 @@ db.auth.onAuthStateChanged(async function(user) {
 		}
 
 		if (!vm) {
-			await axios
-				.get("https://ipapi.co/json/")
-				.then((response) => {
-					store.commit("setUserIP", response.data.ip);
-					store.commit("setUserIPData", response.data);
-				})
-				.catch((error) => {
-					store.commit("setUserIP", "0.0.0.0");
-					store.commit("setUserIPData", null);
-					store.commit("setError", error);
-				});
 			if (user) {
+				await axios
+					.get("https://ipapi.co/json/")
+					.then((response) => {
+						store.commit("setUserIP", response.data.ip);
+						store.commit("setUserIPData", response.data);
+					})
+					.catch((error) => {
+						store.commit("setUserIP", "0.0.0.0");
+						store.commit("setUserIPData", null);
+						store.commit("setError", error);
+					});
+
 				await store.dispatch("autoLogin", {redirectResult, user});
 			} else {
 				await store.dispatch("logout");

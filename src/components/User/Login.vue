@@ -87,6 +87,18 @@
                       <v-icon light>cached</v-icon>
                     </span>
                   </v-btn>
+                  <v-btn
+                    small
+                    color="blue lighten-1"
+                    dark
+                    round
+                    @click="onSignupWithTwitter">
+                    <i class="fa fa-twitter"/>
+                    <span class="ml-1">Sign in with Twitter</span>
+                    <span slot="loader" class="custom-loader">
+                      <v-icon light>cached</v-icon>
+                    </span>
+                  </v-btn>
                 </v-flex>
               </v-layout>
               <v-layout row>
@@ -167,6 +179,11 @@ export default {
 		},
 		onSignupWithGithub() {
 			db.signInWithGithubAuthProvider().catch((error) => {
+				this.$store.commit("setError", error);
+			});
+		},
+		onSignupWithTwitter() {
+			db.signInWithTwitterAuthProvider().catch((error) => {
 				this.$store.commit("setError", error);
 			});
 		},

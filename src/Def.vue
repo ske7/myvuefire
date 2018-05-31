@@ -44,6 +44,48 @@
                       </span>
                     </v-btn>
                   </v-layout>
+                  <v-layout v-if="isFacebookSignIn" row justify-center align-center>
+                    <v-btn
+                      small
+                      color="white"
+                      light
+                      round
+                      @click="onSignupWithFacebook">
+                      <i class="fa fa-facebook-f"/>
+                      <span class="ml-1">Sign in with Facebook</span>
+                      <span slot="loader" class="custom-loader">
+                        <v-icon light>cached</v-icon>
+                      </span>
+                    </v-btn>
+                  </v-layout>
+                  <v-layout v-if="isTwitterSignIn" row justify-center align-center>
+                    <v-btn
+                      small
+                      color="white"
+                      light
+                      round
+                      @click="onSignupWithTwitter">
+                      <i class="fa fa-twitter"/>
+                      <span class="ml-1">Sign in with Twitter</span>
+                      <span slot="loader" class="custom-loader">
+                        <v-icon light>cached</v-icon>
+                      </span>
+                    </v-btn>
+                  </v-layout>
+                  <v-layout v-if="isGithubSignIn" row justify-center align-center>
+                    <v-btn
+                      small
+                      color="white"
+                      light
+                      round
+                      @click="onSignupWithGithub">
+                      <i class="fa fa-github"/>
+                      <span class="ml-1">Sign in with Github</span>
+                      <span slot="loader" class="custom-loader">
+                        <v-icon light>cached</v-icon>
+                      </span>
+                    </v-btn>
+                  </v-layout>
                 </v-alert>
               </v-flex>
             </v-layout>
@@ -82,6 +124,21 @@ export default {
 				this.$store.getters.errorMode === "googleSignIn"
 			);
 		},
+		isFacebookSignIn() {
+			return (
+				this.$store.getters.errorMode === "facebookSignIn"
+			);
+		},
+		isTwitterSignIn() {
+			return (
+				this.$store.getters.errorMode === "twitterSignIn"
+			);
+		},
+		isGithubSignIn() {
+			return (
+				this.$store.getters.errorMode === "githubSignIn"
+			);
+		},
 		headerText() {
 			if (this.$store.getters.loading === true) {
 				return "Loading...";
@@ -104,6 +161,21 @@ export default {
 		},
 		onSignupWithGoogle() {
 			db.signInWithGoogleAuthProvider().catch((error) => {
+				alert(error);
+			});
+		},
+		onSignupWithFacebook() {
+			db.signInWithFacebookAuthProvider().catch((error) => {
+				alert(error);
+			});
+		},
+		onSignupWithTwitter() {
+			db.signInWithTwitterAuthProvider().catch((error) => {
+				alert(error);
+			});
+		},
+		onSignupWithGithub() {
+			db.signInWithGithubAuthProvider().catch((error) => {
 				alert(error);
 			});
 		}

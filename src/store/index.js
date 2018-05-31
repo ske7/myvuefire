@@ -150,6 +150,8 @@ export const store = new Vuex.Store({
 						cred = db.firebase.auth.GithubAuthProvider.credential(credErr.accessToken);
 					} else if (credErr.providerId === "facebook.com") {
 						cred = db.firebase.auth.FacebookAuthProvider.credential(credErr.accessToken);
+					} else if (credErr.providerId === "twitter.com") {
+						cred = db.firebase.auth.TwitterAuthProvider.credential(credErr.accessToken, credErr.secret);
 					}
 
 					try {
@@ -367,20 +369,18 @@ export const store = new Vuex.Store({
 						throw new Error("uid values mismatch");
 					}
 
-					db.deleteCollection(`/users/${state.user.uid}/logins`, 5).then(() => {
-						db.firestore.collection("users").doc(state.user.uid).delete().then(() => {
-							currentUser.delete().then(() => {
-								commit("setIsWorking", false);
-								resolve();
-							}).catch((error) => {
-								commit("setIsWorking", false);
-								reject(error);
-							});
+					currentUser.delete()
+						.then(() => {
+							// after will be triggered firebase function deleteProfile for clearing firestore collections
+							resolve();
+						})
+						.catch((error) => {
+							reject(error);
 						});
-					});
 				} catch (error) {
-					commit("setIsWorking", false);
 					reject(error);
+				} finally {
+					commit("setIsWorking", false);
 				}
 			});
 		}
