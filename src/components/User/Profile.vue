@@ -82,7 +82,7 @@
                     id="displayName"
                     v-model="displayName"
                     name="displayName"
-                    label="User displayed name"
+                    label="User name"
                     type="text"
                     @input="onDisplayNameInput"/>
                 </v-flex>

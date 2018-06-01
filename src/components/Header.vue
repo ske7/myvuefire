@@ -24,7 +24,7 @@
       style="min-width:32px;"
       dark>
       <i class="fa fa-sign-in"/>
-      <span class="ml-2 hidden-xs-only">Login</span>
+      <span class="ml-2 hidden-xs-only">Log in</span>
     </v-btn>
     <v-btn
       v-if="!userIsAuthenticated"
@@ -68,14 +68,14 @@
       dark
       @click="onTryToLogout()">
       <i class="fa fa-sign-out"/>
-      <span class="ml-2 hidden-xs-only">Logout</span>
+      <span class="ml-2 hidden-xs-only">Log out</span>
     </v-btn>
     <p/>
 
     <v-dialog v-model="logoutdialog" max-width="280" persistent transition="fade-transition">
       <v-card>
         <v-layout row justify-center align-center>
-          <v-card-title class="subheading text-xs-center">Do you  really want to logout?</v-card-title>
+          <v-card-title class="subheading text-xs-center">Do you really want to log out?</v-card-title>
         </v-layout>
         <v-layout row justify-center align-center>
           <v-flex text-xs-center mb-1>

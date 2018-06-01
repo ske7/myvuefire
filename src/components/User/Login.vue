@@ -4,7 +4,7 @@
       <v-flex xs12 sm6 offset-sm3>
         <v-card class="blue-border-small" flat>
           <v-card-title primary-title class="headline justify-center">
-            <div text-xs-center>Sign in</div>
+            <div text-xs-center>Login</div>
           </v-card-title>
           <v-card-text>
             <v-container>
@@ -35,8 +35,8 @@
                 </v-layout>
                 <v-layout row justify-center align-center>
                   <v-flex xs12 text-xs-center>
-                    <v-btn :disabled="loading" :loading="loading" type="submit" small color="orange accent-1" light>
-                      <div text-xs-center>Sign in with Email</div>
+                    <v-btn :disabled="loading" :loading="loading" type="submit" color="orange accent-1" light>
+                      <div text-xs-center>LOG IN</div>
                       <span slot="loader" class="custom-loader">
                         <v-icon light>cached</v-icon>
                       </span>

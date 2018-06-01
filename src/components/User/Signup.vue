@@ -4,7 +4,7 @@
       <v-flex xs12 sm6 offset-sm3>
         <v-card class="blue-border-small" flat>
           <v-card-title primary-title class="headline justify-center">
-            <div text-xs-center>Sign up with Email</div>
+            <div text-xs-center>Sign-up</div>
           </v-card-title>
           <v-card-text>
             <v-container>
@@ -23,16 +23,16 @@
                       type="email"/>
                   </v-flex>
                 </v-layout>
-                <!--                   <v-layout row>
-                    <v-flex xs12>
-                      <v-text-field
-                        id="displayName"
-                        v-model="displayName"
-                        name="displayName"
-                        label="User displayed name (optional)"
-                        type="text"/>
-                    </v-flex>
-                  </v-layout> -->
+                <v-layout row>
+                  <v-flex xs12>
+                    <v-text-field
+                      id="displayName"
+                      v-model="displayName"
+                      name="displayName"
+                      label="User name (optional)"
+                      type="text"/>
+                  </v-flex>
+                </v-layout>
                 <v-layout row>
                   <v-flex xs12>
                     <v-text-field
@@ -59,8 +59,8 @@
                 </v-layout>
                 <v-layout row justify-center align-center>
                   <v-flex xs12 text-xs-center>
-                    <v-btn :disabled="signUpProcess" :loading="signUpProcess" type="submit" small color="orange accent-1" light>
-                      Sign up
+                    <v-btn :disabled="signUpProcess" :loading="signUpProcess" type="submit" color="orange accent-1" light>
+                      SIGN UP
                       <span slot="loader" class="custom-loader">
                         <v-icon dark>cached</v-icon>
                       </span>
@@ -71,7 +71,7 @@
               <v-layout row>
                 <v-flex xs12 text-xs-center mt-3>
                   Already have an account?
-                  <router-link to="/login"> Sign in</router-link>
+                  <router-link to="/login"> Log in</router-link>
                 </v-flex>
               </v-layout>
             </v-container>
