@@ -59,7 +59,7 @@
                 </v-layout>
                 <v-layout row justify-center align-center>
                   <v-flex xs12 text-xs-center>
-                    <v-btn :disabled="signUpProcess" :loading="signUpProcess" type="submit" color="orange accent-1" light>
+                    <v-btn :disabled="signUpProcess" :loading="signUpProcess" type="submit" small color="orange accent-1" light>
                       SIGN UP
                       <span slot="loader" class="custom-loader">
                         <v-icon dark>cached</v-icon>

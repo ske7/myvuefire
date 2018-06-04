@@ -35,7 +35,7 @@
                 </v-layout>
                 <v-layout row justify-center align-center>
                   <v-flex xs12 text-xs-center>
-                    <v-btn :disabled="loading" :loading="loading" type="submit" color="orange accent-1" light>
+                    <v-btn :disabled="loading" :loading="loading" type="submit" small color="orange accent-1" light>
                       <div text-xs-center>LOG IN</div>
                       <span slot="loader" class="custom-loader">
                         <v-icon light>cached</v-icon>
