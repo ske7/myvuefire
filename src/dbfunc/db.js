@@ -3,6 +3,7 @@ import firebase from "firebase/app";
 import "firebase/auth";
 import "firebase/firestore";
 import "firebase/storage";
+import "firebase/functions";
 
 import { store } from "@/store";
 
@@ -20,6 +21,7 @@ let auth = firebase.auth(app);
 let firestore = firebase.firestore(app);
 firestore.settings({ timestampsInSnapshots: true });
 let storage = firebase.storage();
+let firefunctions = firebase.functions();
 
 // Functions
 function signInWithGoogleAuthProvider() {
@@ -37,7 +39,7 @@ function signInWithFacebookAuthProvider() {
 	provider.addScope("email");
 	provider.addScope("public_profile");
 	provider.setCustomParameters({
-		"display": "popup"
+		display: "popup"
 	});
 
 	return firebase.auth().signInWithRedirect(provider);
@@ -70,7 +72,8 @@ function addUser(user, isAdmin, extproviderId) {
 				providerId: extproviderId !== undefined ? extproviderId : user.providerId,
 				creationTime: user.metadata.creationTime,
 				lastSignInTime: user.metadata.lastSignInTime,
-				isAdmin: isAdmin
+				isAdmin: isAdmin,
+				disabled: false
 			})
 			.then(() => {
 				userRef.collection("logins").add({
@@ -102,10 +105,28 @@ function updateUserPhotoURL(uid, photoURL) {
 	);
 }
 
+function updateUserDisable(uid, isDisable) {
+	return firestore.collection("users").doc(uid).set(
+		{
+			disabled: isDisable
+		},
+		{ merge: true }
+	);
+}
+
 function updateUserDisplayName(uid, displayName) {
 	return firestore.collection("users").doc(uid).set(
 		{
 			displayName: displayName
+		},
+		{ merge: true }
+	);
+}
+
+function updateUserProviderId(uid, providerId) {
+	return firestore.collection("users").doc(uid).set(
+		{
+			providerId: providerId
 		},
 		{ merge: true }
 	);
@@ -154,7 +175,8 @@ function deleteCollection(collectionPath, batchSize) {
 }
 
 function deleteQueryBatch(query, batchSize, resolve, reject) {
-	query.get()
+	query
+		.get()
 		.then((snapshot) => {
 			if (snapshot.size === 0) {
 				return 0;
@@ -188,6 +210,7 @@ export default {
 	auth,
 	firestore,
 	storage,
+	firefunctions,
 
 	// Functions
 	signInWithGoogleAuthProvider,
@@ -198,6 +221,8 @@ export default {
 	updateUserPhotoURL,
 	updateUserDisplayName,
 	updateUserInfoWhenLogin,
+	updateUserDisable,
+	updateUserProviderId,
 	deleteCollection,
 	deleteQueryBatch
 };
