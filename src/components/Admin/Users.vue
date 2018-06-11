@@ -1,23 +1,13 @@
 <template>
   <div>
-    <slot name="title"/>
-    <v-data-table
-      :headers="headers"
-      :items="items"
-      :loading="dataloading"
-      class="elevation-1 mt-2"
-    >
+    <slot name="title" />
+    <v-data-table :headers="headers" :items="items" :loading="dataloading" :rows-per-page-items="[10, 20]" class="elevation-1 mt-2">
       <template slot="headerCell" slot-scope="props">
-        <v-tooltip bottom>
-          <span slot="activator">
-            {{ props.header.text }}
-          </span>
-          <span>
-            {{ props.header.text }}
-          </span>
-        </v-tooltip>
+        <span>
+          {{ props.header.text }}
+        </span>
       </template>
-      <v-progress-linear slot="progress" :indeterminate="dataloading" color="blue"/>
+      <v-progress-linear slot="progress" :indeterminate="dataloading" color="blue" />
       <template slot="items" slot-scope="props">
         <td class="text-xs-left">{{ props.item.displayName }}</td>
         <td class="text-xs-left">{{ props.item.email }}</td>
@@ -26,8 +16,25 @@
         <td class="text-xs-center">{{ props.item.providerId }}</td>
         <td class="text-xs-center">{{ props.item.isAdmin }}</td>
         <td class="text-xs-center">{{ props.item.emailVerified }}</td>
+        <td class="text-xs-center">{{ props.item.disabled }}</td>
+        <td class="text-xs-center justify-center layout px-0">
+          <v-container justify-center align-center>
+            <v-layout row>
+              <v-tooltip top>
+                <v-btn slot="activator" icon class="mx-0" @click="lockUser(props.item)">
+                  <v-icon color="yellow darken-1">{{ props.item.disabled === "yes" ? "lock" : "lock_open" }}</v-icon>
+                </v-btn>
+                <span>{{ props.item.disabled === "yes" ? "Unlock user" : "Lock user" }}</span>
+              </v-tooltip>
+              <v-btn icon class="mx-0" @click="deleteItem(props.item)">
+                <v-icon color="pink">delete</v-icon>
+              </v-btn>
+            </v-layout>
+          </v-container>
+        </td>
       </template>
     </v-data-table>
+    <app-processing :is-processing="isProcessing" :processing-message="processingMessage" />
   </div>
 </template>
 
@@ -39,18 +46,18 @@ export default {
 	data() {
 		return {
 			dataloading: true,
+			isProcessing: false,
+			processingMessage: "",
 			headers: [
-				{
-					text: "User Name",
-					align: "left",
-					value: "displayName"
-				},
+				{ text: "User name", align: "left", value: "displayName" },
 				{ text: "Email", value: "email", align: "left" },
 				{ text: "Created", value: "creationTime", align: "center" },
 				{ text: "Signed In", value: "lastSignInTime", align: "center" },
 				{ text: "Provider", value: "providerId", align: "center" },
 				{ text: "Admin", value: "isAdmin", align: "center" },
-				{ text: "Email Verified", value: "emailVerified", align: "center" }
+				{ text: "Verified", value: "emailVerified", align: "center" },
+				{ text: "Locked", value: "disabled", align: "center" },
+				{ text: "Actions", value: "name", align: "center", sortable: false }
 			],
 			items: []
 		};
@@ -68,8 +75,8 @@ export default {
 					if (value === true) {
 						arr2[key] = "yes";
 					}
-					if (value === false) {
-						arr2[key] = "no";
+					if ((value === false) || (value === "")) {
+						arr2[key] = "-";
 					}
 				});
 				this.items.push(arr2);
@@ -77,6 +84,27 @@ export default {
 		}).then(() => {
 			this.dataloading = false;
 		});
+	},
+	methods: {
+		lockUser(editedItem) {
+			this.processingMessage = "Working...";
+			this.isProcessing = true;
+			let isDisable = (editedItem.disabled !== "yes");
+			let editedIndex = this.items.indexOf(editedItem);
+			let item = editedItem;
+			const lockUser = db.firefunctions.httpsCallable("modifyLockOfUser");
+			lockUser({uid: editedItem.uid, disabled: isDisable}).then((result) => {
+				db.updateUserDisable(editedItem.uid, isDisable).then(() => {
+					item.disabled = isDisable ? "yes" : "-";
+					Object.assign(this.items[editedIndex], item);
+					this.isProcessing = false;
+				});
+			}).catch((error) => {
+				this.isProcessing = false;
+				alert(error);
+			});
+		}
+
 	}
 };
 </script>
