@@ -14,6 +14,7 @@ import axios from "axios";
 import App from "./App";
 import Def from "./Def";
 import AlertCmp from "./components/Common/Alert.vue";
+import AppProcessing from "./components/Common/Processing.vue";
 
 import { router } from "./router";
 import { store } from "./store";
@@ -36,6 +37,7 @@ Vue.use(Vuetify, {
 });
 Vue.use(VeeValidate);
 Vue.component("app-alert", AlertCmp);
+Vue.component("app-processing", AppProcessing);
 Vue.prototype.$http = axios;
 
 let defvm = new Vue({
@@ -53,41 +55,50 @@ db.auth.onAuthStateChanged(async function(user) {
 		if (store.state.signUpProcess) return false;
 
 		if (user) {
-			await store.dispatch("getconfJSON").then((confdata) => {
-				store.commit("setConfData", confdata);
-			}).catch((error) => {
-				if (error.message === "Request failed with status code 404") {
-					defstore.commit("setError", {errorText: "conf.json not found" + ":" + JSON.stringify(error.response), errorCode: "er101"});
-				} else {
-					defstore.commit("setError", {errorText: error, errorCode: "er100"});
-				}
-			});
+			await store
+				.dispatch("getconfJSON")
+				.then((confdata) => {
+					store.commit("setConfData", confdata);
+				})
+				.catch((error) => {
+					if (error.message === "Request failed with status code 404") {
+						defstore.commit("setError", {
+							errorText: "conf.json not found" + ":" + JSON.stringify(error.response),
+							errorCode: "er101"
+						});
+					} else {
+						defstore.commit("setError", { errorText: error, errorCode: "er100" });
+					}
+				});
 			if (defstore.state.isError) return false;
 		}
 
 		let redirectResult;
-		await db.auth.getRedirectResult().then((result) => {
-			redirectResult = result;
-		}).catch(async(error) => {
-			let errorMode = "";
-			if (error.code === "auth/account-exists-with-different-credential") {
-				await db.auth.fetchSignInMethodsForEmail(error.email).then((signMethods) => {
-					if (signMethods.indexOf("google.com") !== -1) {
-						errorMode = "googleSignIn";
-					} else if (signMethods.indexOf("facebook.com") !== -1) {
-						errorMode = "facebookSignIn";
-					} else if (signMethods.indexOf("twitter.com") !== -1) {
-						errorMode = "twitterSignIn";
-					} else if (signMethods.indexOf("github.com") !== -1) {
-						errorMode = "githubSignIn";
-					}
-					if (errorMode !== "") {
-						localStorage.setItem("firebaseErrorAuthCredential", JSON.stringify(error.credential));
-					}
-				});
-			}
-			defstore.commit("setError", {errorText: error.message, errorCode: error.code, errorMode: errorMode});
-		});
+		await db.auth
+			.getRedirectResult()
+			.then((result) => {
+				redirectResult = result;
+			})
+			.catch(async(error) => {
+				let errorMode = "";
+				if (error.code === "auth/account-exists-with-different-credential") {
+					await db.auth.fetchSignInMethodsForEmail(error.email).then((signMethods) => {
+						if (signMethods.indexOf("google.com") !== -1) {
+							errorMode = "googleSignIn";
+						} else if (signMethods.indexOf("facebook.com") !== -1) {
+							errorMode = "facebookSignIn";
+						} else if (signMethods.indexOf("twitter.com") !== -1) {
+							errorMode = "twitterSignIn";
+						} else if (signMethods.indexOf("github.com") !== -1) {
+							errorMode = "githubSignIn";
+						}
+						if (errorMode !== "") {
+							localStorage.setItem("firebaseErrorAuthCredential", JSON.stringify(error.credential));
+						}
+					});
+				}
+				defstore.commit("setError", { errorText: error.message, errorCode: error.code, errorMode: errorMode });
+			});
 		if (defstore.state.isError) return false;
 
 		if (user) {
@@ -97,6 +108,7 @@ db.auth.onAuthStateChanged(async function(user) {
 				emailVerified: user.emailVerified,
 				displayName: user.displayName,
 				photoURL: user.photoURL,
+				providerId: user.providerId,
 				isAdmin: store.state.confData.adminemail === user.email
 			});
 		}
@@ -115,7 +127,7 @@ db.auth.onAuthStateChanged(async function(user) {
 						store.commit("setError", error);
 					});
 
-				await store.dispatch("autoLogin", {redirectResult, user});
+				await store.dispatch("autoLogin", { redirectResult, user });
 			} else {
 				await store.dispatch("logout");
 			}
@@ -131,6 +143,6 @@ db.auth.onAuthStateChanged(async function(user) {
 			});
 		}
 	} catch (error) {
-		defstore.commit("setError", {errorText: error.message, errorCode: error.code});
+		defstore.commit("setError", { errorText: error.message, errorCode: error.code });
 	}
 });

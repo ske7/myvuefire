@@ -68,6 +68,24 @@ export const store = new Vuex.Store({
 		},
 		setUserIPData(state, payload) {
 			state.ipdata = payload;
+		},
+		updateProviderID(state, payload) {
+			if (payload.length <= 1) {
+				if (
+					payload[0].providerId === "google.com" &&
+					payload.length === 1 &&
+					state.user.providerId !== "google.com"
+				) {
+					db.updateUserProviderId(state.user.uid, "google.com");
+				}
+
+				return;
+			}
+			let arr = [];
+			for (const [ key ] in payload) {
+				arr.push(payload[key].providerId);
+			}
+			db.updateUserProviderId(state.user.uid, arr.join(", "));
 		}
 	},
 
@@ -92,10 +110,10 @@ export const store = new Vuex.Store({
 									emailVerified: false,
 									displayName: payload.displayName,
 									photoURL: "",
+									providerId: "password",
 									isAdmin: state.confData.adminemail === user.email
 								};
-
-								db.addUser(user, newUser.isAdmin).then(() => {
+								db.addUser(user, newUser.isAdmin, "password").then(() => {
 									resolve(newUser);
 								});
 							})
@@ -118,20 +136,19 @@ export const store = new Vuex.Store({
 					.signInWithEmailAndPassword(payload.email, payload.password)
 					.then((result) => {
 						let user = result.user;
-						db
-							.updateUserInfoWhenLogin(user, user.metadata.lastSignInTime)
-							.then(() => {
-								commit("setUser", {
-									uid: user.uid,
-									email: user.email,
-									emailVerified: user.emailVerified,
-									displayName: user.displayName,
-									photoURL: user.photoURL,
-									isAdmin: state.confData.adminemail === user.email
-								});
-								commit("setLoading", false);
-								resolve(user.emailVerified);
+						db.updateUserInfoWhenLogin(user, user.metadata.lastSignInTime, "password").then(() => {
+							commit("setUser", {
+								uid: user.uid,
+								email: user.email,
+								emailVerified: user.emailVerified,
+								displayName: user.displayName,
+								photoURL: user.photoURL,
+								providerId: "password",
+								isAdmin: state.confData.adminemail === user.email
 							});
+							commit("setLoading", false);
+							resolve(user.emailVerified);
+						});
 					})
 					.catch((error) => {
 						reject(error);
@@ -156,7 +173,9 @@ export const store = new Vuex.Store({
 
 					try {
 						if (cred !== null) {
-							user.linkAndRetrieveDataWithCredential(cred);
+							user.linkAndRetrieveDataWithCredential(cred).then(() => {
+								commit("updateProviderID", user.providerData);
+							});
 						}
 					} finally {
 						localStorage.removeItem("firebaseErrorAuthCredential");
@@ -164,11 +183,21 @@ export const store = new Vuex.Store({
 				}
 
 				if (payload.redirectResult.additionalUserInfo.isNewUser) {
-					db.addUser(user, state.confData.adminemail === user.email, payload.redirectResult.additionalUserInfo.providerId);
+					db.addUser(
+						user,
+						state.confData.adminemail === user.email,
+						payload.redirectResult.additionalUserInfo.providerId
+					);
 				} else {
-					db.updateUserInfoWhenLogin(user, user.metadata.lastSignInTime, payload.redirectResult.additionalUserInfo.providerId);
+					commit("updateProviderID", user.providerData);
+					db.updateUserInfoWhenLogin(
+						user,
+						user.metadata.lastSignInTime,
+						payload.redirectResult.additionalUserInfo.providerId
+					);
 				}
 			} else {
+				// todo maybe do not log this?
 				const lastSignInTime = new Date().toUTCString();
 				db.updateUserInfoWhenLogin(payload.user, lastSignInTime);
 			}
@@ -237,6 +266,7 @@ export const store = new Vuex.Store({
 					currentUser
 						.updatePassword(payload.password)
 						.then(function() {
+							commit("updateProviderID", currentUser.providerData);
 							commit("setLoading3", false);
 							resolve();
 						})
@@ -311,11 +341,9 @@ export const store = new Vuex.Store({
 									photoURL: url
 								})
 								.then(function() {
-									db
-										.updateUserPhotoURL(payload.userid, url)
-										.then(() => {
-											resolve(url);
-										});
+									db.updateUserPhotoURL(payload.userid, url).then(() => {
+										resolve(url);
+									});
 								});
 						});
 					})
@@ -332,7 +360,8 @@ export const store = new Vuex.Store({
 				commit("clearError");
 
 				db.storage
-					.ref().child("profileImages/" + payload.userid + "/pImg_" + payload.userid + payload.ext)
+					.ref()
+					.child("profileImages/" + payload.userid + "/pImg_" + payload.userid + payload.ext)
 					.delete()
 					.then(() => {
 						let currentUser = db.auth.currentUser;
@@ -341,11 +370,9 @@ export const store = new Vuex.Store({
 								photoURL: ""
 							})
 							.then(function() {
-								db
-									.updateUserPhotoURL(payload.userid, "")
-									.then(() => {
-										resolve();
-									});
+								db.updateUserPhotoURL(payload.userid, "").then(() => {
+									resolve();
+								});
 							});
 					})
 					.catch((error) => {
@@ -369,7 +396,8 @@ export const store = new Vuex.Store({
 						throw new Error("uid values mismatch");
 					}
 
-					currentUser.delete()
+					currentUser
+						.delete()
 						.then(() => {
 							// after will be triggered firebase function deleteProfile for clearing firestore collections
 							resolve();
