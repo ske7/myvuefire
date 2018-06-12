@@ -26,15 +26,25 @@
                 </v-btn>
                 <span>{{ props.item.disabled === "yes" ? "Unlock user" : "Lock user" }}</span>
               </v-tooltip>
-              <v-btn icon class="mx-0" @click="deleteItem(props.item)">
-                <v-icon color="pink">delete</v-icon>
-              </v-btn>
+              <v-tooltip top>
+                <v-btn slot="activator" icon class="mx-0" @click="onTryToDeleteUserProfile(props.item)" >
+                  <v-icon color="pink">delete</v-icon>
+                </v-btn>
+                <span>Delete user profile</span>
+              </v-tooltip>
             </v-layout>
           </v-container>
         </td>
       </template>
     </v-data-table>
-    <app-processing :is-processing="isProcessing" :processing-message="processingMessage" />
+    <app-processing :is-processing="isProcessing" />
+    <keep-alive>
+      <app-yescanceldlg
+        :toggle="deleteprofiledialog"
+        question="Do you really want to delete user profile?"
+        @cancel-dialog="deleteprofiledialog = false"
+        @accept-question="deleteUserProfile()"/>
+    </keep-alive>
   </div>
 </template>
 
@@ -47,7 +57,8 @@ export default {
 		return {
 			dataloading: true,
 			isProcessing: false,
-			processingMessage: "",
+			deleteprofiledialog: false,
+			propsItem: null,
 			headers: [
 				{ text: "User name", align: "left", value: "displayName" },
 				{ text: "Email", value: "email", align: "left" },
@@ -87,7 +98,6 @@ export default {
 	},
 	methods: {
 		lockUser(editedItem) {
-			this.processingMessage = "Working...";
 			this.isProcessing = true;
 			let isDisable = (editedItem.disabled !== "yes");
 			let editedIndex = this.items.indexOf(editedItem);
@@ -103,8 +113,27 @@ export default {
 				this.isProcessing = false;
 				alert(error);
 			});
-		}
+		},
+		onTryToDeleteUserProfile(propsItem) {
+			this.deleteprofiledialog = true;
+			this.propsItem = propsItem;
+		},
+		deleteUserProfile() {
+			const deleteditem = this.propsItem;
+			this.propsItem = null;
+			this.deleteprofiledialog = false;
+			this.isProcessing = true;
+			let editedIndex = this.items.indexOf(deleteditem);
 
+			const deleteUserProfile = db.firefunctions.httpsCallable("deleteUserProfile");
+			deleteUserProfile({uid: deleteditem.uid}).then((result) => {
+				this.items.splice(editedIndex, 1);
+				this.isProcessing = false;
+			}).catch((error) => {
+				this.isProcessing = false;
+				alert(error);
+			});
+		}
 	}
 };
 </script>
