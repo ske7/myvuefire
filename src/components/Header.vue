@@ -71,20 +71,13 @@
       <span class="ml-2 hidden-xs-only">Log out</span>
     </v-btn>
     <p/>
-
-    <v-dialog v-model="logoutdialog" max-width="280" persistent transition="fade-transition">
-      <v-card>
-        <v-layout row justify-center align-center>
-          <v-card-title class="subheading text-xs-center">Do you really want to log out?</v-card-title>
-        </v-layout>
-        <v-layout row justify-center align-center>
-          <v-flex text-xs-center mb-1>
-            <v-btn small color="green darken-5" outline @click.native="onLogout()">Yes</v-btn>
-            <v-btn small color="green darken-5" outline @click.native="logoutdialog = false">Cancel</v-btn>
-          </v-flex>
-        </v-layout>
-      </v-card>
-    </v-dialog>
+    <keep-alive>
+      <app-yescanceldlg
+        :toggle="logoutdialog"
+        question="Do you really want to log out?"
+        @cancel-dialog="logoutdialog = false"
+        @accept-question="onLogout()"/>
+    </keep-alive>
   </v-toolbar>
 </template>
 
