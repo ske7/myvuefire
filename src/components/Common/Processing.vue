@@ -3,7 +3,9 @@
     <v-card>
       <v-layout row justify-center align-center>
         <v-card-title class="subheading text-xs-center">{{ processingMessage }}
-          <v-progress-circular :size="20" indeterminate color="green" />
+          <span>
+            <v-progress-circular :size="20" indeterminate color="green" />
+          </span>
         </v-card-title>
       </v-layout>
     </v-card>
@@ -21,7 +23,7 @@ export default {
 		},
 		"processing-message": {
 			type: String,
-			default: "Working...",
+			default: "Working... ",
 			required: false
 		}
 	}
