@@ -54,24 +54,22 @@ db.auth.onAuthStateChanged(async function(user) {
 	try {
 		if (store.state.signUpProcess) return false;
 
-		if (user) {
-			await store
-				.dispatch("getconfJSON")
-				.then((confdata) => {
-					store.commit("setConfData", confdata);
-				})
-				.catch((error) => {
-					if (error.message === "Request failed with status code 404") {
-						defstore.commit("setError", {
-							errorText: "conf.json not found" + ":" + JSON.stringify(error.response),
-							errorCode: "er101"
-						});
-					} else {
-						defstore.commit("setError", { errorText: error, errorCode: "er100" });
-					}
-				});
-			if (defstore.state.isError) return false;
-		}
+		await store
+			.dispatch("getconfJSON")
+			.then((confdata) => {
+				store.commit("setConfData", confdata);
+			})
+			.catch((error) => {
+				if (error.message === "Request failed with status code 404") {
+					defstore.commit("setError", {
+						errorText: "conf.json not found" + ":" + JSON.stringify(error.response),
+						errorCode: "er101"
+					});
+				} else {
+					defstore.commit("setError", { errorText: error, errorCode: "er100" });
+				}
+			});
+		if (defstore.state.isError) return false;
 
 		let redirectResult;
 		await db.auth
