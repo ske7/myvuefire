@@ -22,7 +22,8 @@
                       style="min-width:48px;"
                       color="blue darken-4"
                       dark
-                      @click.native="onEmailVerification()">
+                      @click.native="onEmailVerification()"
+                    >
                       <span slot="loader" class="custom-loader">
                         <v-icon light>cached</v-icon>
                       </span>Verify
@@ -58,17 +59,9 @@
                 <v-layout row justify-center align-center>
                   <v-flex text-xs-center fluid>
                     <div style="cursor:pointer" @click="onChooseProfileImage()">
-                      <v-card-media
-                        :src="profileImg"
-                        height="80px"
-                        contain/>
+                      <v-card-media :src="profileImg" height="80px" contain/>
                     </div>
-                    <input
-                      ref="profileImgInput"
-                      type="file"
-                      class="disp-none"
-                      accept="image/jpeg, image/png"
-                      @change="onFilePicked($event)">
+                    <input ref="profileImgInput" type="file" class="disp-none" accept="image/jpeg, image/png" @change="onFilePicked($event)">
                   </v-flex>
                 </v-layout>
               </v-card>
@@ -78,13 +71,7 @@
             <v-form ref="form" lazy-validation @submit.prevent="onUpdateProfile">
               <v-layout row>
                 <v-flex xs12>
-                  <v-text-field
-                    id="displayName"
-                    v-model="displayName"
-                    name="displayName"
-                    label="User name"
-                    type="text"
-                    @input="onDisplayNameInput"/>
+                  <v-text-field id="displayName" v-model="displayName" name="displayName" label="User name" type="text" @input="onDisplayNameInput" />
                 </v-flex>
               </v-layout>
               <v-layout row>
@@ -102,7 +89,7 @@
                     name="password"
                     label="New password"
                     type="password"
-                    @input="onPassInput"/>
+                    @input="onPassInput" />
                 </v-flex>
               </v-layout>
               <v-layout row>
@@ -115,7 +102,7 @@
                     :rules="[comparePasswords]"
                     name="confirmPassword"
                     label="Confirm new password"
-                    type="password"/>
+                    type="password" />
                 </v-flex>
               </v-layout>
               <v-layout row justify-center align-center>
@@ -134,28 +121,14 @@
                       <v-icon light>cached</v-icon>
                     </span>
                   </v-btn>
-                  <v-btn
-                    :disabled="loading3 || !needToChangePassword"
-                    :loading="loading3"
-                    style="max-width:150px;"
-                    small
-                    color="orange accent-1"
-                    light
-                    @click.native="onChangePassword()">
+                  <v-btn :disabled="loading3 || !needToChangePassword" :loading="loading3" style="max-width:150px;" small color="orange accent-1" light @click.native="onChangePassword()">
                     Change password
                     <span slot="loader" class="custom-loader">
                       <v-icon light>cached</v-icon>
                     </span>
                   </v-btn>
                   <v-tooltip bottom open-delay="500">
-                    <v-btn
-                      slot="activator"
-                      style="max-width:120px;min-width:32px"
-                      small
-                      color="red darken-1"
-                      class="text-xs-left"
-                      dark
-                      @click.native="onChooseToEraseProfile()">
+                    <v-btn slot="activator" style="max-width:120px;min-width:32px" small color="red darken-1" class="text-xs-left" dark @click.native="onChooseToEraseProfile()">
                       <v-icon dark>delete</v-icon>
                     </v-btn>
                     <span>Delete profile</span>
@@ -176,7 +149,7 @@
     </v-layout>
     <v-layout v-if="error" row justify-center align-center>
       <v-flex xs12 sm6>
-        <app-alert :text="error.message" :code="error.code" @dismissed="onDismissed"/>
+        <app-alert :text="error.message" :code="error.code" @dismissed="onDismissed" />
       </v-flex>
     </v-layout>
     <v-dialog v-model="relogindialog" max-width="280" persistent transition="fade-transition">
@@ -217,22 +190,9 @@
         </v-layout>
       </v-card>
     </v-dialog>
-    <v-dialog v-model="isWorking" max-width="150" persistent transition="fade-transition">
-      <v-card>
-        <v-layout row justify-center align-center>
-          <v-card-title class="subheading text-xs-center">Working...
-            <v-progress-circular :size="20" indeterminate color="green"/>
-          </v-card-title>
-        </v-layout>
-      </v-card>
-    </v-dialog>
+    <app-processing :is-processing="isProcessing" />
     <keep-alive>
-      <yesnowithtimedialog
-        :toggle="profileEraseDialog"
-        :initcounter="3"
-        question="A you certainly want to erase your profile?"
-        @cancel-dialog="profileEraseDialog = false"
-        @accept-question="onEraseProfile()"/>
+      <yesnowithtimedialog :toggle="profileEraseDialog" :initcounter="3" question="A you certainly want to erase your profile?" @cancel-dialog="profileEraseDialog = false" @accept-question="onEraseProfile()" />
     </keep-alive>
   </v-container>
 </template>
@@ -274,7 +234,8 @@ export default {
 				color: "green",
 				fontSize: "13px"
 			},
-			photoURL: ""
+			photoURL: "",
+			isProcessing: false
 		};
 	},
 	computed: {
@@ -298,9 +259,6 @@ export default {
 		},
 		loading3() {
 			return this.$store.getters.loading3;
-		},
-		isWorking() {
-			return this.$store.getters.isWorking;
 		},
 		imgloading() {
 			return this.$store.getters.imgloading;
@@ -382,11 +340,16 @@ export default {
 		},
 		onEraseProfile() {
 			this.profileEraseDialog = false;
+			this.isProcessing = true;
 			this.$store.dispatch("eraseProfile").then(() => {
-				this.$router.push("/");
-			}).then(() => {
-				this.$store.commit("setUser", null);
+				this.isProcessing = false;
+				this.$store.dispatch("logout").then(
+					() => {
+						this.$router.push("/");
+					}
+				);
 			}).catch((error) => {
+				this.isProcessing = false;
 				this.$store.commit("setError", error);
 				if (error.code === "auth/requires-recent-login") {
 					this.relogindialog = true;

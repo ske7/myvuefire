@@ -19,8 +19,7 @@ export const store = new Vuex.Store({
 		error: null,
 		confData: null,
 		ip: "0.0.0.0",
-		ipdata: null,
-		isWorking: false
+		ipdata: null
 	},
 
 	mutations: {
@@ -35,9 +34,6 @@ export const store = new Vuex.Store({
 		},
 		setLoading3(state, payload) {
 			state.loading3 = payload;
-		},
-		setIsWorking(state, payload) {
-			state.isWorking = payload;
 		},
 		setSignUpProcess(state, payload) {
 			state.signUpProcess = payload;
@@ -384,7 +380,6 @@ export const store = new Vuex.Store({
 		},
 		eraseProfile({ commit, state }) {
 			return new Promise((resolve, reject) => {
-				commit("setIsWorking", true);
 				commit("clearError");
 
 				try {
@@ -396,10 +391,10 @@ export const store = new Vuex.Store({
 						throw new Error("uid values mismatch");
 					}
 
-					currentUser
-						.delete()
+					db.firefunctions.httpsCallable("deleteUserProfile")({
+						uid: currentUser.uid
+					})
 						.then(() => {
-							// after will be triggered firebase function deleteProfile for clearing firestore collections
 							resolve();
 						})
 						.catch((error) => {
@@ -407,8 +402,6 @@ export const store = new Vuex.Store({
 						});
 				} catch (error) {
 					reject(error);
-				} finally {
-					commit("setIsWorking", false);
 				}
 			});
 		}
@@ -426,9 +419,6 @@ export const store = new Vuex.Store({
 		},
 		loading3(state) {
 			return state.loading3;
-		},
-		isWorking(state) {
-			return state.isWorking;
 		},
 		imgloading(state) {
 			return state.imgloading;
