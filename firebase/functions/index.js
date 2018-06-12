@@ -5,7 +5,7 @@ const admin = require("firebase-admin");
 // Init
 admin.initializeApp(functions.config().firebase);
 
-// Functions
+// Inner functions
 function deleteCollection(collectionPath, batchSize) {
 	let collectionRef = admin.firestore().collection(collectionPath);
 	let query = collectionRef.limit(batchSize);
@@ -46,12 +46,20 @@ function deleteQueryBatch(query, batchSize, resolve, reject) {
 		.catch(reject);
 }
 
-const deleteProfile = functions.auth.user().onDelete((user) => {
-	return deleteCollection(`/users/${user.uid}/logins`, 5)
+// Functions to export
+const deleteUserProfile = functions.https.onCall((data, context) => {
+	return admin
+		.auth()
+		.deleteUser(data.uid)
 		.then(() => {
-			return admin.firestore().collection("users").doc(user.uid).delete();
+			return deleteCollection(`/users/${data.uid}/logins`, 5).then(() => {
+				return admin.firestore().collection("users").doc(data.uid).delete();
+			});
 		})
-		.catch();
+		.catch((error) => {
+			console.log("Error deleting user profile:", error);
+			throw new functions.https.HttpsError("internal", "Error deleting user profile: " + error.message);
+		});
 });
 
 const modifyLockOfUser = functions.https.onCall((data, context) => {
@@ -60,19 +68,18 @@ const modifyLockOfUser = functions.https.onCall((data, context) => {
 		.updateUser(data.uid, {
 			disabled: data.disabled
 		})
-		.then((userRecord) => {
+		.then(() => {
 			const lockedStr = data.disabled ? "locked" : "unlocked";
-			// console.log(`Successfully ${lockedStr} the user`, userRecord.toJSON());
 			return { done: true, message: `Successfully ${lockedStr} the user` };
 		})
 		.catch((error) => {
 			console.log("Error updating user:", error);
-			return error;
+			throw new functions.https.HttpsError("internal", "Error updating user: " + error.message);
 		});
 });
 
 // Exports
 module.exports = {
-	deleteProfile,
+	deleteUserProfile,
 	modifyLockOfUser
 };
