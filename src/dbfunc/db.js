@@ -61,8 +61,7 @@ function addUser(user, isAdmin, extproviderId) {
         displayName: user.displayName,
         photoURL: user.photoURL,
         emailVerified: user.emailVerified,
-        providerId:
-          extproviderId !== undefined ? extproviderId : user.providerId,
+        providerId: extproviderId !== undefined ? extproviderId : user.providerId,
         creationTime: user.metadata.creationTime,
         lastSignInTime: user.metadata.lastSignInTime,
         isAdmin: isAdmin,
