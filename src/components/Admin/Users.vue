@@ -45,6 +45,11 @@
         @cancel-dialog="deleteprofiledialog = false"
         @accept-question="deleteUserProfile()" />
     </keep-alive>
+    <v-layout v-if="error" row>
+      <v-flex xs12 sm6 offset-sm3 mt-1>
+        <app-alert :text="error.message" @dismissed="onDismissed" />
+      </v-flex>
+    </v-layout>
   </div>
 </template>
 
@@ -73,7 +78,13 @@ export default {
       items: []
     };
   },
+  computed: {
+    error() {
+      return this.$store.getters.error;
+    }
+  },
   created() {
+    this.$store.dispatch("clearError");
     this.dataloading = true;
     let arr = [];
     db.firestore.collection("users").get().then((querySnapshot) => {
@@ -111,8 +122,11 @@ export default {
         });
       }).catch((error) => {
         this.isProcessing = false;
-        alert(error);
+        this.$store.commit("setError", error);
       });
+    },
+    onDismissed() {
+      this.$store.dispatch("clearError");
     },
     onTryToDeleteUserProfile(propsItem) {
       this.deleteprofiledialog = true;
@@ -131,7 +145,7 @@ export default {
         this.isProcessing = false;
       }).catch((error) => {
         this.isProcessing = false;
-        alert(error);
+        this.$store.commit("setError", error);
       });
     }
   }
