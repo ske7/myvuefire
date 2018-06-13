@@ -103,83 +103,83 @@ import Footer from "./components/Footer.vue";
 import db from "@/dbfunc/db";
 
 export default {
-	name: "Def",
-	components: {
-		appHeader: DefHeader,
-		appFooter: Footer
-	},
-	computed: {
-		isLoading() {
-			return (
-				this.$store.getters.loading
-			);
-		},
-		isError() {
-			return (
-				this.$store.getters.isError
-			);
-		},
-		isGoogleSignIn() {
-			return (
-				this.$store.getters.errorMode === "googleSignIn"
-			);
-		},
-		isFacebookSignIn() {
-			return (
-				this.$store.getters.errorMode === "facebookSignIn"
-			);
-		},
-		isTwitterSignIn() {
-			return (
-				this.$store.getters.errorMode === "twitterSignIn"
-			);
-		},
-		isGithubSignIn() {
-			return (
-				this.$store.getters.errorMode === "githubSignIn"
-			);
-		},
-		headerText() {
-			if (this.$store.getters.loading === true) {
-				return "Loading...";
-			}
-			if (this.$store.getters.isError === true) {
-				return "Error!";
-			}
-			return "Information";
-		},
-		errorText() {
-			return this.$store.state.errorText;
-		},
-		errorCode() {
-			return this.$store.state.errorCode;
-		}
-	},
-	methods: {
-		reload() {
-			location.reload();
-		},
-		onSignupWithGoogle() {
-			db.signInWithGoogleAuthProvider().catch((error) => {
-				alert(error);
-			});
-		},
-		onSignupWithFacebook() {
-			db.signInWithFacebookAuthProvider().catch((error) => {
-				alert(error);
-			});
-		},
-		onSignupWithTwitter() {
-			db.signInWithTwitterAuthProvider().catch((error) => {
-				alert(error);
-			});
-		},
-		onSignupWithGithub() {
-			db.signInWithGithubAuthProvider().catch((error) => {
-				alert(error);
-			});
-		}
-	}
+  name: "Def",
+  components: {
+    appHeader: DefHeader,
+    appFooter: Footer
+  },
+  computed: {
+    isLoading() {
+      return (
+        this.$store.getters.loading
+      );
+    },
+    isError() {
+      return (
+        this.$store.getters.isError
+      );
+    },
+    isGoogleSignIn() {
+      return (
+        this.$store.getters.errorMode === "googleSignIn"
+      );
+    },
+    isFacebookSignIn() {
+      return (
+        this.$store.getters.errorMode === "facebookSignIn"
+      );
+    },
+    isTwitterSignIn() {
+      return (
+        this.$store.getters.errorMode === "twitterSignIn"
+      );
+    },
+    isGithubSignIn() {
+      return (
+        this.$store.getters.errorMode === "githubSignIn"
+      );
+    },
+    headerText() {
+      if (this.$store.getters.loading === true) {
+        return "Loading...";
+      }
+      if (this.$store.getters.isError === true) {
+        return "Error!";
+      }
+      return "Information";
+    },
+    errorText() {
+      return this.$store.state.errorText;
+    },
+    errorCode() {
+      return this.$store.state.errorCode;
+    }
+  },
+  methods: {
+    reload() {
+      location.reload();
+    },
+    onSignupWithGoogle() {
+      db.signInWithGoogleAuthProvider().catch((error) => {
+        alert(error);
+      });
+    },
+    onSignupWithFacebook() {
+      db.signInWithFacebookAuthProvider().catch((error) => {
+        alert(error);
+      });
+    },
+    onSignupWithTwitter() {
+      db.signInWithTwitterAuthProvider().catch((error) => {
+        alert(error);
+      });
+    },
+    onSignupWithGithub() {
+      db.signInWithGithubAuthProvider().catch((error) => {
+        alert(error);
+      });
+    }
+  }
 };
 </script>
 

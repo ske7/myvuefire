@@ -83,39 +83,39 @@
 
 <script>
 export default {
-	name: "Header",
-	data() {
-		return {
-			logoutdialog: false
-		};
-	},
-	computed: {
-		userIsAuthenticated() {
-			return (
-				this.$store.getters.user !== null &&
+  name: "Header",
+  data() {
+    return {
+      logoutdialog: false
+    };
+  },
+  computed: {
+    userIsAuthenticated() {
+      return (
+        this.$store.getters.user !== null &&
 				this.$store.getters.user !== undefined
-			);
-		},
-		userIsAdmin() {
-			return (
-				this.$store.getters.user !== null &&
+      );
+    },
+    userIsAdmin() {
+      return (
+        this.$store.getters.user !== null &&
 				this.$store.getters.user !== undefined &&
 				this.$store.getters.isadminemail === true
-			);
-		}
-	},
-	methods: {
-		onTryToLogout() {
-			this.logoutdialog = true;
-		},
-		onLogout() {
-			this.logoutdialog = false;
-			this.$store.dispatch("logout").then(
-				() => {
-					this.$router.push("/");
-				}
-			);
-		}
-	}
+      );
+    }
+  },
+  methods: {
+    onTryToLogout() {
+      this.logoutdialog = true;
+    },
+    onLogout() {
+      this.logoutdialog = false;
+      this.$store.dispatch("logout").then(
+        () => {
+          this.$router.push("/");
+        }
+      );
+    }
+  }
 };
 </script>

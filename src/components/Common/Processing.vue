@@ -14,18 +14,18 @@
 
 <script>
 export default {
-	name: "VProcessing",
-	props: {
-		"is-processing": {
-			type: Boolean,
-			default: false,
-			required: true
-		},
-		"processing-message": {
-			type: String,
-			default: "Working... ",
-			required: false
-		}
-	}
+  name: "VProcessing",
+  props: {
+    "is-processing": {
+      type: Boolean,
+      default: false,
+      required: true
+    },
+    "processing-message": {
+      type: String,
+      default: "Working... ",
+      required: false
+    }
+  }
 };
 </script>

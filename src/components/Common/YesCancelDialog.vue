@@ -16,26 +16,26 @@
 
 <script>
 export default {
-	name: "YesCancelDialog",
-	props: {
-		question: {
-			type: String,
-			default: "",
-			required: true
-		},
-		toggle: {
-			type: Boolean,
-			default: false,
-			required: true
-		}
-	},
-	methods: {
-		onCancel() {
-			this.$emit("cancel-dialog");
-		},
-		onAccept() {
-			this.$emit("accept-question");
-		}
-	}
+  name: "YesCancelDialog",
+  props: {
+    question: {
+      type: String,
+      default: "",
+      required: true
+    },
+    toggle: {
+      type: Boolean,
+      default: false,
+      required: true
+    }
+  },
+  methods: {
+    onCancel() {
+      this.$emit("cancel-dialog");
+    },
+    onAccept() {
+      this.$emit("accept-question");
+    }
+  }
 };
 </script>

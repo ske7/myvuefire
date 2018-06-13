@@ -12,23 +12,23 @@
 
 <script>
 export default {
-	name: "Footer",
-	data() {
-		return {
-			startYear: 2017,
-			copyrightText: "SKE777 LTD"
-		};
-	},
-	computed: {
-		footerText() {
-			var currYear = new Date().getFullYear();
-			var years = currYear.toString();
-			if (this.startYear !== currYear) {
-				years = this.startYear.toString() + " - " + years;
-			}
-			return years + ", " + this.copyrightText;
-		}
-	}
+  name: "Footer",
+  data() {
+    return {
+      startYear: 2017,
+      copyrightText: "SKE777 LTD"
+    };
+  },
+  computed: {
+    footerText() {
+      var currYear = new Date().getFullYear();
+      var years = currYear.toString();
+      if (this.startYear !== currYear) {
+        years = this.startYear.toString() + " - " + years;
+      }
+      return years + ", " + this.copyrightText;
+    }
+  }
 };
 </script>
 

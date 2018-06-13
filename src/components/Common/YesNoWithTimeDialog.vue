@@ -16,75 +16,75 @@
 
 <script>
 export default {
-	name: "YesNoWithTimeDialog",
-	props: {
-		question: {
-			type: String,
-			default: "",
-			required: true
-		},
-		toggle: {
-			type: Boolean,
-			default: false,
-			required: true
-		},
-		initcounter: {
-			type: Number,
-			default: 5,
-			required: false
-		}
-	},
-	data() {
-		return {
-			tm: null,
-			interval: null,
-			counter: this.initcounter,
-			disabled: true
-		};
-	},
-	computed: {
-		yesDisable() {
-			return this.disabled;
-		},
-		showCounter() {
-			if (this.counter > 0) {
-				return `: ${this.counter}`;
-			} else {
-				clearTimeout(this.tm);
-				clearInterval(this.interval);
-				return "";
-			}
-		}
-	},
-	watch: {
-		"toggle": function() {
-			if (this.toggle) {
-				this.counter = this.initcounter;
-				this.disabled = true;
-				this.$nextTick(function() {
-					this.$refs.cancelBtn.$el.focus();
-				});
-				this.interval = window.setInterval(() => {
-					this.counter = this.counter - 1;
-				}, 1000);
-				this.tm = setTimeout(() => {
-					this.disabled = false;
-				}, this.initcounter * 1000);
-			} else {
-				this.$nextTick(function() {
-					clearTimeout(this.tm);
-					clearInterval(this.interval);
-				});
-			}
-		}
-	},
-	methods: {
-		onCancel() {
-			this.$emit("cancel-dialog");
-		},
-		onAccept() {
-			this.$emit("accept-question");
-		}
-	}
+  name: "YesNoWithTimeDialog",
+  props: {
+    question: {
+      type: String,
+      default: "",
+      required: true
+    },
+    toggle: {
+      type: Boolean,
+      default: false,
+      required: true
+    },
+    initcounter: {
+      type: Number,
+      default: 5,
+      required: false
+    }
+  },
+  data() {
+    return {
+      tm: null,
+      interval: null,
+      counter: this.initcounter,
+      disabled: true
+    };
+  },
+  computed: {
+    yesDisable() {
+      return this.disabled;
+    },
+    showCounter() {
+      if (this.counter > 0) {
+        return `: ${this.counter}`;
+      } else {
+        clearTimeout(this.tm);
+        clearInterval(this.interval);
+        return "";
+      }
+    }
+  },
+  watch: {
+    "toggle": function() {
+      if (this.toggle) {
+        this.counter = this.initcounter;
+        this.disabled = true;
+        this.$nextTick(function() {
+          this.$refs.cancelBtn.$el.focus();
+        });
+        this.interval = window.setInterval(() => {
+          this.counter = this.counter - 1;
+        }, 1000);
+        this.tm = setTimeout(() => {
+          this.disabled = false;
+        }, this.initcounter * 1000);
+      } else {
+        this.$nextTick(function() {
+          clearTimeout(this.tm);
+          clearInterval(this.interval);
+        });
+      }
+    }
+  },
+  methods: {
+    onCancel() {
+      this.$emit("cancel-dialog");
+    },
+    onAccept() {
+      this.$emit("accept-question");
+    }
+  }
 };
 </script>

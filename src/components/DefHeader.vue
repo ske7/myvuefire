@@ -39,6 +39,6 @@
 
 <script>
 export default {
-	name: "DefHeader"
+  name: "DefHeader"
 };
 </script>

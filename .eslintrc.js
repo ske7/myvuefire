@@ -1,50 +1,45 @@
 module.exports = {
   root: true,
   parserOptions: {
-    parser: 'babel-eslint',
+    parser: "babel-eslint",
     ecmaVersion: 2017,
-    sourceType: 'module'
+    sourceType: "module"
   },
   env: {
     browser: true,
+    es6: true
   },
   extends: [
-    'plugin:vue/recommended', 
-    'eslint:recommended',
-    'standard'
+    "standard",
+    "plugin:vue/recommended",
+    "plugin:vue/essential",
+    "eslint:recommended",
+    "plugin:vue-libs/recommended"
   ],
   // required to lint *.vue files
-  plugins: [
-    'vue'
-  ],
+  plugins: ["vue"],
   // add your custom rules here
   rules: {
-	"space-before-function-paren": [2, "never"],
-	"no-console": 0,
-	"no-tabs": 0,
-	"no-new": 0,
-			"semi": [
-				"error",
-				"always"
-			],
-			"quotes": [
-				"error",
-				"double"
-			],
-			"indent": [
-				"error",
-				"tab"
-			],
-			"vue/max-attributes-per-line": [2, {
-				"singleline": 7,
-				"multiline": {
-					"max": 1,
-					"allowFirstLine": false
-				}
-			}],	
-    // allow async-await
-    'generator-star-spacing': 'off',
-    // allow debugger during development
-    'no-debugger': process.env.NODE_ENV === 'production' ? 'error' : 'off'
+    "prefer-arrow-callback": [2, { allowNamedFunctions: false }],
+    "arrow-parens": 2,
+    "space-before-function-paren": [2, "never"],
+    "no-console": 0,
+    "no-tabs": 0,
+    "no-new": 0,
+    semi: [2, "always"],
+    quotes: [2, "double"],
+    indent: [2, 2],
+    "vue/max-attributes-per-line": [
+      0,
+      {
+        singleline: 7,
+        multiline: {
+          max: 7,
+          allowFirstLine: true
+        }
+      }
+    ],
+    "generator-star-spacing": 0,
+    "no-debugger": process.env.NODE_ENV === "production" ? 2 : 0
   }
-}
+};

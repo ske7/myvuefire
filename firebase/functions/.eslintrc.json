@@ -8,6 +8,9 @@
   ],
   "extends": "eslint:recommended",
   "rules": {
+    // Require parens in arrow function arguments
+    "arrow-parens": 2,
+
     // Removed rule "disallow the use of console" from recommended eslint rules
     "no-console": "off",
 

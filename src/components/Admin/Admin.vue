@@ -36,41 +36,41 @@
 import db from "@/dbfunc/db";
 
 export default {
-	name: "Admin",
-	components: {
-		Config: () => import("./Config.vue"),
-		Users: () => import("./Users.vue")
-	},
-	data() {
-		return {
-			drawer: true,
-			mini: true,
-			selectedid: 0,
-			currentItemComponent: "Config",
-			items: [
-				{ id: 0, title: "Config", icon: "build" },
-				{ id: 1, title: "Users", icon: "group" }
-			],
-			title: "Admin panel!"
-		};
-	},
-	created() {
-		this.$store.dispatch("clearError");
-		let currentUser = db.auth.currentUser;
-		if (currentUser) {
-			if (!currentUser.emailVerified) {
-				this.$router.push("/profile");
-			}
-		}
-		this.chooseAdminPage(this.selectedid);
-	},
-	methods: {
-		chooseAdminPage(id) {
-			this.selectedid = id;
-			this.currentItemComponent = this.items[id].title;
-			this.title = this.items[id].title;
-		}
-	}
+  name: "Admin",
+  components: {
+    Config: () => import("./Config.vue"),
+    Users: () => import("./Users.vue")
+  },
+  data() {
+    return {
+      drawer: true,
+      mini: true,
+      selectedid: 0,
+      currentItemComponent: "Config",
+      items: [
+        { id: 0, title: "Config", icon: "build" },
+        { id: 1, title: "Users", icon: "group" }
+      ],
+      title: "Admin panel!"
+    };
+  },
+  created() {
+    this.$store.dispatch("clearError");
+    const currentUser = db.auth.currentUser;
+    if (currentUser) {
+      if (!currentUser.emailVerified) {
+        this.$router.push("/profile");
+      }
+    }
+    this.chooseAdminPage(this.selectedid);
+  },
+  methods: {
+    chooseAdminPage(id) {
+      this.selectedid = id;
+      this.currentItemComponent = this.items[id].title;
+      this.title = this.items[id].title;
+    }
+  }
 };
 </script>
 
