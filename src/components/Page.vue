@@ -25,22 +25,22 @@
 
 <script>
 export default {
-	name: "Page",
-	data() {
-		return {
-			isNotVerified: false,
-			msg: "Welcome to Your VueFire CRM!"
-		};
-	},
-	created() {
-		this.$store.dispatch("clearError");
-		this.isNotVerified = !this.$store.getters.isUserVerified;
-	},
-	methods: {
-		onVerificationAgreed() {
-			this.$router.push("/profile");
-		}
-	}
+  name: "Page",
+  data() {
+    return {
+      isNotVerified: false,
+      msg: "Welcome to Your VueFire CRM!"
+    };
+  },
+  created() {
+    this.$store.dispatch("clearError");
+    this.isNotVerified = !this.$store.getters.isUserVerified;
+  },
+  methods: {
+    onVerificationAgreed() {
+      this.$router.push("/profile");
+    }
+  }
 };
 </script>
 

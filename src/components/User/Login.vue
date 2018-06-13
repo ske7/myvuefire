@@ -119,7 +119,7 @@
     </v-layout>
     <v-layout v-if="error" row>
       <v-flex xs12 sm6 offset-sm3>
-        <app-alert :text="error.message" @dismissed="onDismissed"/>
+        <app-alert :text="error.message" @dismissed="onDismissed" />
       </v-flex>
     </v-layout>
   </v-container>
@@ -129,67 +129,67 @@
 import db from "@/dbfunc/db";
 
 export default {
-	name: "Login",
-	data() {
-		return {
-			email: "",
-			password: ""
-		};
-	},
-	computed: {
-		error() {
-			return this.$store.getters.error;
-		},
-		loading() {
-			return this.$store.getters.loading;
-		}
-	},
-	created() {
-		this.$store.dispatch("clearError");
-	},
-	methods: {
-		onLogin() {
-			if (this.$refs.form.validate()) {
-				this.$store.dispatch("logUserIn", {
-					email: this.email,
-					password: this.password
-				}).then((emailVerified) => {
-					if (!emailVerified) {
-						this.$router.push("/profile");
-					} else {
-						this.$router.push("/");
-					}
-				}).catch((error) => {
-					this.$store.dispatch("logout").then(() => {
-						this.$store.commit("setLoading", false);
-						this.$store.commit("setError", error);
-					});
-				});
-			}
-		},
-		onSignupWithGoogle() {
-			db.signInWithGoogleAuthProvider().catch((error) => {
-				this.$store.commit("setError", error);
-			});
-		},
-		onSignupWithFacebook() {
-			db.signInWithFacebookAuthProvider().catch((error) => {
-				this.$store.commit("setError", error);
-			});
-		},
-		onSignupWithGithub() {
-			db.signInWithGithubAuthProvider().catch((error) => {
-				this.$store.commit("setError", error);
-			});
-		},
-		onSignupWithTwitter() {
-			db.signInWithTwitterAuthProvider().catch((error) => {
-				this.$store.commit("setError", error);
-			});
-		},
-		onDismissed() {
-			this.$store.dispatch("clearError");
-		}
-	}
+  name: "Login",
+  data() {
+    return {
+      email: "",
+      password: ""
+    };
+  },
+  computed: {
+    error() {
+      return this.$store.getters.error;
+    },
+    loading() {
+      return this.$store.getters.loading;
+    }
+  },
+  created() {
+    this.$store.dispatch("clearError");
+  },
+  methods: {
+    onLogin() {
+      if (this.$refs.form.validate()) {
+        this.$store.dispatch("logUserIn", {
+          email: this.email,
+          password: this.password
+        }).then((emailVerified) => {
+          if (!emailVerified) {
+            this.$router.push("/profile");
+          } else {
+            this.$router.push("/");
+          }
+        }).catch((error) => {
+          this.$store.dispatch("logout").then(() => {
+            this.$store.commit("setLoading", false);
+            this.$store.commit("setError", error);
+          });
+        });
+      }
+    },
+    onSignupWithGoogle() {
+      db.signInWithGoogleAuthProvider().catch((error) => {
+        this.$store.commit("setError", error);
+      });
+    },
+    onSignupWithFacebook() {
+      db.signInWithFacebookAuthProvider().catch((error) => {
+        this.$store.commit("setError", error);
+      });
+    },
+    onSignupWithGithub() {
+      db.signInWithGithubAuthProvider().catch((error) => {
+        this.$store.commit("setError", error);
+      });
+    },
+    onSignupWithTwitter() {
+      db.signInWithTwitterAuthProvider().catch((error) => {
+        this.$store.commit("setError", error);
+      });
+    },
+    onDismissed() {
+      this.$store.dispatch("clearError");
+    }
+  }
 };
 </script>

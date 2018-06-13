@@ -81,7 +81,7 @@
     </v-layout>
     <v-layout v-if="error" row>
       <v-flex xs12 sm6 offset-sm3>
-        <app-alert :text="error.message" @dismissed="onDismissed"/>
+        <app-alert :text="error.message" @dismissed="onDismissed" />
       </v-flex>
     </v-layout>
   </v-container>
@@ -89,65 +89,65 @@
 
 <script>
 export default {
-	name: "Signup",
-	data() {
-		return {
-			email: "",
-			displayName: "",
-			password: "",
-			confirmPassword: ""
-		};
-	},
-	computed: {
-		comparePasswords() {
-			if (!this.password) {
-				return true;
-			}
-			if (this.password === this.confirmPassword) {
-				return true;
-			}
-			return "Passwords do not match";
-		},
-		error() {
-			return this.$store.getters.error;
-		},
-		signUpProcess() {
-			return this.$store.getters.signUpProcess;
-		}
-	},
-	created() {
-		this.$store.dispatch("clearError");
-	},
-	methods: {
-		validateBeforeSubmit() {
-			return this.$validator.validateAll().then((result) => {
-				return result;
-			});
-		},
-		onSignup() {
-			this.validateBeforeSubmit().then((validateResult) => {
-				if (!validateResult) return;
-				if (this.$refs.form.validate()) {
-					this.$store.dispatch("signUserUp", {
-						email: this.email,
-						password: this.password,
-						displayName: this.displayName
-					}).then((newUser) => {
-						this.$store.commit("setUser", newUser);
-						this.$store.commit("setSignUpProcess", false);
-						this.$router.push("/profile");
-					}).catch((error) => {
-						this.$store.commit("setUser", null);
-						this.$store.commit("setSignUpProcess", false);
-						this.$store.commit("setError", error);
-					});
-				}
-			});
-		},
-		onDismissed() {
-			this.$store.dispatch("clearError");
-		}
-	}
+  name: "Signup",
+  data() {
+    return {
+      email: "",
+      displayName: "",
+      password: "",
+      confirmPassword: ""
+    };
+  },
+  computed: {
+    comparePasswords() {
+      if (!this.password) {
+        return true;
+      }
+      if (this.password === this.confirmPassword) {
+        return true;
+      }
+      return "Passwords do not match";
+    },
+    error() {
+      return this.$store.getters.error;
+    },
+    signUpProcess() {
+      return this.$store.getters.signUpProcess;
+    }
+  },
+  created() {
+    this.$store.dispatch("clearError");
+  },
+  methods: {
+    validateBeforeSubmit() {
+      return this.$validator.validateAll().then((result) => {
+        return result;
+      });
+    },
+    onSignup() {
+      this.validateBeforeSubmit().then((validateResult) => {
+        if (!validateResult) return;
+        if (this.$refs.form.validate()) {
+          this.$store.dispatch("signUserUp", {
+            email: this.email,
+            password: this.password,
+            displayName: this.displayName
+          }).then((newUser) => {
+            this.$store.commit("setUser", newUser);
+            this.$store.commit("setSignUpProcess", false);
+            this.$router.push("/profile");
+          }).catch((error) => {
+            this.$store.commit("setUser", null);
+            this.$store.commit("setSignUpProcess", false);
+            this.$store.commit("setError", error);
+          });
+        }
+      });
+    },
+    onDismissed() {
+      this.$store.dispatch("clearError");
+    }
+  }
 };
 </script>
 

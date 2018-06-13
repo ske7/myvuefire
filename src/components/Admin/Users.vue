@@ -27,7 +27,7 @@
                 <span>{{ props.item.disabled === "yes" ? "Unlock user" : "Lock user" }}</span>
               </v-tooltip>
               <v-tooltip top>
-                <v-btn slot="activator" icon class="mx-0" @click="onTryToDeleteUserProfile(props.item)" >
+                <v-btn slot="activator" icon class="mx-0" @click="onTryToDeleteUserProfile(props.item)">
                   <v-icon color="pink">delete</v-icon>
                 </v-btn>
                 <span>Delete user profile</span>
@@ -43,7 +43,7 @@
         :toggle="deleteprofiledialog"
         question="Do you really want to delete user profile?"
         @cancel-dialog="deleteprofiledialog = false"
-        @accept-question="deleteUserProfile()"/>
+        @accept-question="deleteUserProfile()" />
     </keep-alive>
   </div>
 </template>
@@ -52,88 +52,88 @@
 import db from "@/dbfunc/db";
 
 export default {
-	name: "Users",
-	data() {
-		return {
-			dataloading: true,
-			isProcessing: false,
-			deleteprofiledialog: false,
-			propsItem: null,
-			headers: [
-				{ text: "User name", align: "left", value: "displayName" },
-				{ text: "Email", value: "email", align: "left" },
-				{ text: "Created", value: "creationTime", align: "center" },
-				{ text: "Signed In", value: "lastSignInTime", align: "center" },
-				{ text: "Provider", value: "providerId", align: "center" },
-				{ text: "Admin", value: "isAdmin", align: "center" },
-				{ text: "Verified", value: "emailVerified", align: "center" },
-				{ text: "Locked", value: "disabled", align: "center" },
-				{ text: "Actions", value: "name", align: "center", sortable: false }
-			],
-			items: []
-		};
-	},
-	created() {
-		this.dataloading = true;
-		let arr = [];
-		db.firestore.collection("users").get().then((querySnapshot) => {
-			querySnapshot.forEach((doc) => {
-				arr = doc.data();
-				let arr2 = {};
-				Object.keys(arr).forEach(function(key) {
-					var value = arr[key];
-					arr2[key] = value;
-					if (value === true) {
-						arr2[key] = "yes";
-					}
-					if ((value === false) || (value === "")) {
-						arr2[key] = "-";
-					}
-				});
-				this.items.push(arr2);
-			});
-		}).then(() => {
-			this.dataloading = false;
-		});
-	},
-	methods: {
-		lockUser(editedItem) {
-			this.isProcessing = true;
-			let isDisable = (editedItem.disabled !== "yes");
-			let editedIndex = this.items.indexOf(editedItem);
-			let item = editedItem;
-			const lockUser = db.firefunctions.httpsCallable("modifyLockOfUser");
-			lockUser({uid: editedItem.uid, disabled: isDisable}).then((result) => {
-				db.updateUserDisable(editedItem.uid, isDisable).then(() => {
-					item.disabled = isDisable ? "yes" : "-";
-					Object.assign(this.items[editedIndex], item);
-					this.isProcessing = false;
-				});
-			}).catch((error) => {
-				this.isProcessing = false;
-				alert(error);
-			});
-		},
-		onTryToDeleteUserProfile(propsItem) {
-			this.deleteprofiledialog = true;
-			this.propsItem = propsItem;
-		},
-		deleteUserProfile() {
-			const deleteditem = this.propsItem;
-			this.propsItem = null;
-			this.deleteprofiledialog = false;
-			this.isProcessing = true;
-			let editedIndex = this.items.indexOf(deleteditem);
+  name: "Users",
+  data() {
+    return {
+      dataloading: true,
+      isProcessing: false,
+      deleteprofiledialog: false,
+      propsItem: null,
+      headers: [
+        { text: "User name", align: "left", value: "displayName" },
+        { text: "Email", value: "email", align: "left" },
+        { text: "Created", value: "creationTime", align: "center" },
+        { text: "Signed In", value: "lastSignInTime", align: "center" },
+        { text: "Provider", value: "providerId", align: "center" },
+        { text: "Admin", value: "isAdmin", align: "center" },
+        { text: "Verified", value: "emailVerified", align: "center" },
+        { text: "Locked", value: "disabled", align: "center" },
+        { text: "Actions", value: "name", align: "center", sortable: false }
+      ],
+      items: []
+    };
+  },
+  created() {
+    this.dataloading = true;
+    let arr = [];
+    db.firestore.collection("users").get().then((querySnapshot) => {
+      querySnapshot.forEach((doc) => {
+        arr = doc.data();
+        const arr2 = {};
+        Object.keys(arr).forEach((key) => {
+          var value = arr[key];
+          arr2[key] = value;
+          if (value === true) {
+            arr2[key] = "yes";
+          }
+          if ((value === false) || (value === "")) {
+            arr2[key] = "-";
+          }
+        });
+        this.items.push(arr2);
+      });
+    }).then(() => {
+      this.dataloading = false;
+    });
+  },
+  methods: {
+    lockUser(editedItem) {
+      this.isProcessing = true;
+      const isDisable = (editedItem.disabled !== "yes");
+      const editedIndex = this.items.indexOf(editedItem);
+      const item = editedItem;
+      const lockUser = db.firefunctions.httpsCallable("modifyLockOfUser");
+      lockUser({ uid: editedItem.uid, disabled: isDisable }).then((result) => {
+        db.updateUserDisable(editedItem.uid, isDisable).then(() => {
+          item.disabled = isDisable ? "yes" : "-";
+          Object.assign(this.items[editedIndex], item);
+          this.isProcessing = false;
+        });
+      }).catch((error) => {
+        this.isProcessing = false;
+        alert(error);
+      });
+    },
+    onTryToDeleteUserProfile(propsItem) {
+      this.deleteprofiledialog = true;
+      this.propsItem = propsItem;
+    },
+    deleteUserProfile() {
+      const deleteditem = this.propsItem;
+      this.propsItem = null;
+      this.deleteprofiledialog = false;
+      this.isProcessing = true;
+      const editedIndex = this.items.indexOf(deleteditem);
 
-			const deleteUserProfile = db.firefunctions.httpsCallable("deleteUserProfile");
-			deleteUserProfile({uid: deleteditem.uid}).then((result) => {
-				this.items.splice(editedIndex, 1);
-				this.isProcessing = false;
-			}).catch((error) => {
-				this.isProcessing = false;
-				alert(error);
-			});
-		}
-	}
+      const deleteUserProfile = db.firefunctions.httpsCallable("deleteUserProfile");
+      deleteUserProfile({ uid: deleteditem.uid }).then((result) => {
+        this.items.splice(editedIndex, 1);
+        this.isProcessing = false;
+      }).catch((error) => {
+        this.isProcessing = false;
+        alert(error);
+      });
+    }
+  }
 };
 </script>

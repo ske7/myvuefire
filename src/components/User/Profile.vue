@@ -202,318 +202,344 @@ import db from "@/dbfunc/db";
 import YesNoWithTimeDialog from "@/components/Common/YesNoWithTimeDialog";
 
 export default {
-	name: "Profile",
-	components: {
-		"yesnowithtimedialog": YesNoWithTimeDialog
-	},
-	data() {
-		return {
-			email: "",
-			oldDisplayName: "",
-			displayName: "",
-			password: "",
-			confirmPassword: "",
-			confirmPasswordDisabled: true,
-			emailVerified: false,
-			alertColor: "success",
-			alertUpdateText: "",
-			notVerifiedStyle: {
-				color: "red",
-				fontSize: "13px"
-			},
-			verificationEmailSent: false,
-			profileUpdated: false,
-			passwordChanged: false,
-			alreadyChangePassword: true,
-			relogindialog: false,
-			relogindialog2: false,
-			profimgdeletedialog: false,
-			profileEraseDialog: false,
-			needToVerify: false,
-			verifiedStyle: {
-				color: "green",
-				fontSize: "13px"
-			},
-			photoURL: "",
-			isProcessing: false
-		};
-	},
-	computed: {
-		comparePasswords() {
-			if (!this.password) {
-				return true;
-			}
-			if (this.password === this.confirmPassword) {
-				return true;
-			}
-			return "Passwords do not match";
-		},
-		error() {
-			return this.$store.getters.error;
-		},
-		loading() {
-			return this.$store.getters.loading;
-		},
-		loading2() {
-			return this.$store.getters.loading2;
-		},
-		loading3() {
-			return this.$store.getters.loading3;
-		},
-		imgloading() {
-			return this.$store.getters.imgloading;
-		},
-		needToUpdate() {
-			return (this.oldDisplayName !== this.displayName);
-		},
-		needToChangePassword() {
-			return (this.password !== "") && (this.confirmPassword !== "") && !this.alreadyChangePassword;
-		},
-		profileImg() {
-			if (this.photoURL) {
-				return this.photoURL;
-			} else {
-				return require("../../assets/profiledefault.jpg");
-			}
-		}
-	},
-	created() {
-		this.$store.dispatch("clearError");
-		if (this.$store.getters.user !== null && this.$store.getters.user !== undefined) {
-			this.email = this.$store.getters.user.email;
-			this.displayName = this.$store.getters.user.displayName;
-			this.oldDisplayName = this.$store.getters.user.displayName;
-			this.emailVerified = this.$store.getters.user.emailVerified;
-			if (this.$store.getters.user.photoURL) {
-				this.photoURL = this.$store.getters.user.photoURL;
-			} else {
-				this.photoURL = "";
-			}
-			if (!this.emailVerified) {
-				this.needToVerify = true;
-				this.alertColor = "blue";
-				this.alertUpdateText = "You have to get verification before proceed to work!";
-			}
-		}
-	},
-	methods: {
-		setUpdatedFlagsToFalse() {
-			this.passwordChanged = false;
-			this.profileUpdated = false;
-			this.verificationEmailSent = false;
-		},
-		onDisplayNameInput() {
-			this.profileUpdated = false;
-		},
-		onPassInput(value) {
-			this.passwordChanged = false;
-			if (value === "") {
-				this.confirmPassword = "";
-				this.confirmPasswordDisabled = true;
-				this.alreadyChangePassword = true;
-			} else {
-				this.alreadyChangePassword = false;
-				this.confirmPasswordDisabled = false;
-			}
-		},
-		onUpdateProfile() {
-			this.profileUpdated = false;
-			this.$store.dispatch("updateUserProfile", {
-				userid: this.$store.getters.user.uid,
-				displayName: this.displayName
-			}).then(
-				() => {
-					this.alertUpdateText = "Your profile updated successfully!";
-					this.alertColor = "success";
-					this.oldDisplayName = this.displayName;
-					this.$store.commit("setUserDisplayName", this.displayName);
-					this.profileUpdated = true;
-				}
-			).catch(
-				() => {
-					this.setUpdatedFlagsToFalse();
-				}
-			);
-		},
-		onChooseToEraseProfile() {
-			this.profileEraseDialog = true;
-		},
-		onEraseProfile() {
-			this.profileEraseDialog = false;
-			this.isProcessing = true;
-			this.$store.dispatch("eraseProfile").then(() => {
-				this.isProcessing = false;
-				this.$store.dispatch("logout").then(
-					() => {
-						this.$router.push("/");
-					}
-				);
-			}).catch((error) => {
-				this.isProcessing = false;
-				this.$store.commit("setError", error);
-				if (error.code === "auth/requires-recent-login") {
-					this.relogindialog = true;
-				}
-			});
-		},
-		onChangePassword() {
-			if (this.$refs.form.validate()) {
-				this.passwordChanged = false;
-				this.$store.dispatch("changeUserPassword", {
-					password: this.password
-				}).then(
-					() => {
-						this.alertUpdateText = "Your password changed successfully!";
-						this.alertColor = "success";
-						this.passwordChanged = true;
-						this.alreadyChangePassword = true;
-					}
-				).catch(
-					(error) => {
-						this.setUpdatedFlagsToFalse();
-						if (error.code === "auth/requires-recent-login") {
-							this.relogindialog = true;
-						}
-					}
-				);
-			}
-		},
-		onEmailVerification() {
-			this.emailVerified = db.auth.currentUser.emailVerified;
-			if (this.emailVerified) {
-				this.$store.commit("setUserVerified");
-				this.setUpdatedFlagsToFalse();
-				return;
-			}
-			this.$store.dispatch("sendVerificationEmail").then(
-				() => {
-					this.verificationEmailSent = true;
-					this.alertUpdateText = "Please, check for the verification email in your inbox and click the link in that email to proceed!";
-					this.alertColor = "success";
-					this.relogindialog2 = true;
-				}).catch(
-				() => {
-					this.setUpdatedFlagsToFalse();
-				}
-			);
-		},
-		onDismissed() {
-			this.$store.dispatch("clearError");
-		},
-		onRelogin() {
-			this.relogindialog = false;
-			this.$store.dispatch("logout").then(
-				() => {
-					this.$router.push("/login");
-				}
-			);
-		},
-		onChooseToDeleteProfileImage() {
-			if (this.photoURL !== "") {
-				this.profimgdeletedialog = true;
-			}
-		},
-		onDeleteProfileImage() {
-			this.profimgdeletedialog = false;
-			let extension = this.photoURL.substring(this.photoURL.lastIndexOf("."), this.photoURL.lastIndexOf(".") + 4);
-			if (extension === ".jpe") {
-				extension = ".jpeg";
-			}
+  name: "Profile",
+  components: {
+    yesnowithtimedialog: YesNoWithTimeDialog
+  },
+  data() {
+    return {
+      email: "",
+      oldDisplayName: "",
+      displayName: "",
+      password: "",
+      confirmPassword: "",
+      confirmPasswordDisabled: true,
+      emailVerified: false,
+      alertColor: "success",
+      alertUpdateText: "",
+      notVerifiedStyle: {
+        color: "red",
+        fontSize: "13px"
+      },
+      verificationEmailSent: false,
+      profileUpdated: false,
+      passwordChanged: false,
+      alreadyChangePassword: true,
+      relogindialog: false,
+      relogindialog2: false,
+      profimgdeletedialog: false,
+      profileEraseDialog: false,
+      needToVerify: false,
+      verifiedStyle: {
+        color: "green",
+        fontSize: "13px"
+      },
+      photoURL: "",
+      isProcessing: false
+    };
+  },
+  computed: {
+    comparePasswords() {
+      if (!this.password) {
+        return true;
+      }
+      if (this.password === this.confirmPassword) {
+        return true;
+      }
+      return "Passwords do not match";
+    },
+    error() {
+      return this.$store.getters.error;
+    },
+    loading() {
+      return this.$store.getters.loading;
+    },
+    loading2() {
+      return this.$store.getters.loading2;
+    },
+    loading3() {
+      return this.$store.getters.loading3;
+    },
+    imgloading() {
+      return this.$store.getters.imgloading;
+    },
+    needToUpdate() {
+      return this.oldDisplayName !== this.displayName;
+    },
+    needToChangePassword() {
+      return (
+        this.password !== "" &&
+        this.confirmPassword !== "" &&
+        !this.alreadyChangePassword
+      );
+    },
+    profileImg() {
+      if (this.photoURL) {
+        return this.photoURL;
+      } else {
+        return require("../../assets/profiledefault.jpg");
+      }
+    }
+  },
+  created() {
+    this.$store.dispatch("clearError");
+    if (
+      this.$store.getters.user !== null &&
+      this.$store.getters.user !== undefined
+    ) {
+      this.email = this.$store.getters.user.email;
+      this.displayName = this.$store.getters.user.displayName;
+      this.oldDisplayName = this.$store.getters.user.displayName;
+      this.emailVerified = this.$store.getters.user.emailVerified;
+      if (this.$store.getters.user.photoURL) {
+        this.photoURL = this.$store.getters.user.photoURL;
+      } else {
+        this.photoURL = "";
+      }
+      if (!this.emailVerified) {
+        this.needToVerify = true;
+        this.alertColor = "blue";
+        this.alertUpdateText =
+          "You have to get verification before proceed to work!";
+      }
+    }
+  },
+  methods: {
+    setUpdatedFlagsToFalse() {
+      this.passwordChanged = false;
+      this.profileUpdated = false;
+      this.verificationEmailSent = false;
+    },
+    onDisplayNameInput() {
+      this.profileUpdated = false;
+    },
+    onPassInput(value) {
+      this.passwordChanged = false;
+      if (value === "") {
+        this.confirmPassword = "";
+        this.confirmPasswordDisabled = true;
+        this.alreadyChangePassword = true;
+      } else {
+        this.alreadyChangePassword = false;
+        this.confirmPasswordDisabled = false;
+      }
+    },
+    onUpdateProfile() {
+      this.profileUpdated = false;
+      this.$store
+        .dispatch("updateUserProfile", {
+          userid: this.$store.getters.user.uid,
+          displayName: this.displayName
+        })
+        .then(() => {
+          this.alertUpdateText = "Your profile updated successfully!";
+          this.alertColor = "success";
+          this.oldDisplayName = this.displayName;
+          this.$store.commit("setUserDisplayName", this.displayName);
+          this.profileUpdated = true;
+        })
+        .catch(() => {
+          this.setUpdatedFlagsToFalse();
+        });
+    },
+    onChooseToEraseProfile() {
+      this.profileEraseDialog = true;
+    },
+    onEraseProfile() {
+      this.profileEraseDialog = false;
+      this.isProcessing = true;
+      this.$store
+        .dispatch("eraseProfile")
+        .then(() => {
+          this.isProcessing = false;
+          this.$store.dispatch("logout").then(() => {
+            this.$router.push("/");
+          });
+        })
+        .catch((error) => {
+          this.isProcessing = false;
+          this.$store.commit("setError", error);
+          if (error.code === "auth/requires-recent-login") {
+            this.relogindialog = true;
+          }
+        });
+    },
+    onChangePassword() {
+      if (this.$refs.form.validate()) {
+        this.passwordChanged = false;
+        this.$store
+          .dispatch("changeUserPassword", {
+            password: this.password
+          })
+          .then(() => {
+            this.alertUpdateText = "Your password changed successfully!";
+            this.alertColor = "success";
+            this.passwordChanged = true;
+            this.alreadyChangePassword = true;
+          })
+          .catch((error) => {
+            this.setUpdatedFlagsToFalse();
+            if (error.code === "auth/requires-recent-login") {
+              this.relogindialog = true;
+            }
+          });
+      }
+    },
+    onEmailVerification() {
+      this.emailVerified = db.auth.currentUser.emailVerified;
+      if (this.emailVerified) {
+        this.$store.commit("setUserVerified");
+        this.setUpdatedFlagsToFalse();
+        return;
+      }
+      this.$store
+        .dispatch("sendVerificationEmail")
+        .then(() => {
+          this.verificationEmailSent = true;
+          this.alertUpdateText =
+            "Please, check for the verification email in your inbox and click the link in that email to proceed!";
+          this.alertColor = "success";
+          this.relogindialog2 = true;
+        })
+        .catch(() => {
+          this.setUpdatedFlagsToFalse();
+        });
+    },
+    onDismissed() {
+      this.$store.dispatch("clearError");
+    },
+    onRelogin() {
+      this.relogindialog = false;
+      this.$store.dispatch("logout").then(() => {
+        this.$router.push("/login");
+      });
+    },
+    onChooseToDeleteProfileImage() {
+      if (this.photoURL !== "") {
+        this.profimgdeletedialog = true;
+      }
+    },
+    onDeleteProfileImage() {
+      this.profimgdeletedialog = false;
+      let extension = this.photoURL.substring(
+        this.photoURL.lastIndexOf("."),
+        this.photoURL.lastIndexOf(".") + 4
+      );
+      if (extension === ".jpe") {
+        extension = ".jpeg";
+      }
 
-			this.$store.dispatch("deleteProfileImage", {
-				userid: this.$store.getters.user.uid,
-				ext: extension
-			}).then(() => {
-				this.photoURL = "";
-				this.$store.commit("setUserPhotoURL", "");
-				this.$store.commit("setImgLoading", false);
-			});
-		},
-		onChooseProfileImage() {
-			this.$refs.profileImgInput.click();
-		},
-		onFilePicked(event) {
-			const file = event.target.files[0];
-			let filename = file.name;
-			if (filename.lastIndexOf(".") <= 0) {
-				this.$store.commit("setError", new Error("Please choose a valid image file!"));
-			}
+      this.$store
+        .dispatch("deleteProfileImage", {
+          userid: this.$store.getters.user.uid,
+          ext: extension
+        })
+        .then(() => {
+          this.photoURL = "";
+          this.$store.commit("setUserPhotoURL", "");
+          this.$store.commit("setImgLoading", false);
+        });
+    },
+    onChooseProfileImage() {
+      this.$refs.profileImgInput.click();
+    },
+    onFilePicked(event) {
+      const file = event.target.files[0];
+      const filename = file.name;
+      if (filename.lastIndexOf(".") <= 0) {
+        this.$store.commit(
+          "setError",
+          new Error("Please choose a valid image file!")
+        );
+      }
 
-			let extension = filename.substring(filename.lastIndexOf("."));
+      const extension = filename.substring(filename.lastIndexOf("."));
 
-			var validFileType = ".jpg , .png , .jpeg";
-			if (validFileType.toLowerCase().indexOf(extension) < 0) {
-				this.$store.commit("setError", new Error("Please choose a valid image file! The supported file types are: .jpg, .png, .jpeg"));
-				return false;
-			}
+      var validFileType = ".jpg , .png , .jpeg";
+      if (validFileType.toLowerCase().indexOf(extension) < 0) {
+        this.$store.commit(
+          "setError",
+          new Error(
+            "Please choose a valid image file! The supported file types are: .jpg, .png, .jpeg"
+          )
+        );
+        return false;
+      }
 
-			if (file.size > 50 * 1024) {
-				this.$store.commit("setError", new Error("The image file size must be less than 50kb."));
-				return false;
-			}
+      if (file.size > 50 * 1024) {
+        this.$store.commit(
+          "setError",
+          new Error("The image file size must be less than 50kb.")
+        );
+        return false;
+      }
 
-			let photoURLSave = this.photoURL;
+      const photoURLSave = this.photoURL;
 
-			const fileReader = new FileReader();
-			const getMimetype = (signature) => {
-				switch (signature) {
-				case "89504E47":
-					return "image/png";
-				case "FFD8FFDB":
-				case "FFD8FFE0":
-					return "image/jpeg";
-				default:
-					return "Unknown filetype";
-				}
-			};
+      const fileReader = new FileReader();
+      const getMimetype = (signature) => {
+        switch (signature) {
+        case "89504E47":
+          return "image/png";
+        case "FFD8FFDB":
+        case "FFD8FFE0":
+          return "image/jpeg";
+        default:
+          return "Unknown filetype";
+        }
+      };
 
-			new Promise(function(resolve, reject) {
-				fileReader.onloadend = function(evt) {
-					if (evt.target.readyState === FileReader.DONE) {
-						let signbytes = evt.target.result;
-						const uint = new Uint8Array(signbytes);
-						let bytes = [];
-						uint.forEach((byte) => {
-							bytes.push(byte.toString(16));
-						});
-						const hex = bytes.join("").toUpperCase();
-						const mime = getMimetype(hex);
-						if (mime !== "Unknown filetype") {
-							resolve();
-						} else {
-							reject(new Error("Unknown filetype signature error!"));
-						}
-					}
-				};
-			}).then(() => {
-				fileReader.onloadend = null;
-				fileReader.readAsDataURL(file);
-				this.$store.dispatch("setProfileImage", {
-					userid: this.$store.getters.user.uid,
-					ext: extension,
-					image: file
-				}).then((imageurl) => {
-					this.$store.commit("setUserPhotoURL", imageurl);
-					this.photoURL = imageurl;
-					this.$store.commit("setImgLoading", false);
-				});
-			}).catch((error) => {
-				this.photoURL = photoURLSave;
-				this.$store.commit("setError", error);
-				return false;
-			});
+      new Promise((resolve, reject) => {
+        fileReader.onloadend = function(evt) {
+          if (evt.target.readyState === FileReader.DONE) {
+            const signbytes = evt.target.result;
+            const uint = new Uint8Array(signbytes);
+            const bytes = [];
+            uint.forEach((byte) => {
+              bytes.push(byte.toString(16));
+            });
+            const hex = bytes.join("").toUpperCase();
+            const mime = getMimetype(hex);
+            if (mime !== "Unknown filetype") {
+              resolve();
+            } else {
+              reject(new Error("Unknown filetype signature error!"));
+            }
+          }
+        };
+      })
+        .then(() => {
+          fileReader.onloadend = null;
+          fileReader.readAsDataURL(file);
+          this.$store
+            .dispatch("setProfileImage", {
+              userid: this.$store.getters.user.uid,
+              ext: extension,
+              image: file
+            })
+            .then((imageurl) => {
+              this.$store.commit("setUserPhotoURL", imageurl);
+              this.photoURL = imageurl;
+              this.$store.commit("setImgLoading", false);
+            });
+        })
+        .catch((error) => {
+          this.photoURL = photoURLSave;
+          this.$store.commit("setError", error);
+          return false;
+        });
 
-			fileReader.readAsArrayBuffer(file.slice(0, 4));
-		}
-	}
+      fileReader.readAsArrayBuffer(file.slice(0, 4));
+    }
+  }
 };
 </script>
 
 <style scoped>
-	.btnprof {
-		min-height: 10px;
-		min-width: 10px;
-		height: 20px;
-		width: 22px;
-	}
+.btnprof {
+  min-height: 10px;
+  min-width: 10px;
+  height: 20px;
+  width: 22px;
+}
 </style>

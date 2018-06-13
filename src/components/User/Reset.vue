@@ -54,37 +54,37 @@
 
 <script>
 export default {
-	name: "Reset",
-	data() {
-		return {
-			passwordResetEmailSent: false,
-			email: ""
-		};
-	},
-	computed: {
-		error() {
-			return this.$store.getters.error;
-		},
-		loading() {
-			return this.$store.getters.loading;
-		}
-	},
-	created() {
-		this.$store.dispatch("clearError");
-	},
-	methods: {
-		onReset() {
-			if (this.$refs.form.validate()) {
-				this.$store.dispatch("passwordReset", {email: this.email}).then(
-					() => {
-						this.passwordResetEmailSent = true;
-					}
-				);
-			}
-		},
-		onDismissed() {
-			this.$store.dispatch("clearError");
-		}
-	}
+  name: "Reset",
+  data() {
+    return {
+      passwordResetEmailSent: false,
+      email: ""
+    };
+  },
+  computed: {
+    error() {
+      return this.$store.getters.error;
+    },
+    loading() {
+      return this.$store.getters.loading;
+    }
+  },
+  created() {
+    this.$store.dispatch("clearError");
+  },
+  methods: {
+    onReset() {
+      if (this.$refs.form.validate()) {
+        this.$store.dispatch("passwordReset", { email: this.email }).then(
+          () => {
+            this.passwordResetEmailSent = true;
+          }
+        );
+      }
+    },
+    onDismissed() {
+      this.$store.dispatch("clearError");
+    }
+  }
 };
 </script>
