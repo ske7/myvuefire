@@ -16,6 +16,7 @@ import Def from "./Def";
 import AlertCmp from "./components/Common/Alert.vue";
 import AppProcessing from "./components/Common/Processing.vue";
 import AppYesCancelDialog from "./components/Common/YesCancelDialog.vue";
+import AlertPopup from "./components/Common/AlertPopup.vue";
 
 import { router } from "./router";
 import { store } from "./store";
@@ -40,6 +41,7 @@ Vue.use(VeeValidate);
 Vue.component("app-alert", AlertCmp);
 Vue.component("app-processing", AppProcessing);
 Vue.component("app-yescanceldlg", AppYesCancelDialog);
+Vue.component("app-alertpop", AlertPopup);
 Vue.prototype.$http = axios;
 
 const defvm = new Vue({
