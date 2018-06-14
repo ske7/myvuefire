@@ -1,5 +1,5 @@
 <template>
-  <v-container>
+  <v-container fluid fill-height>
     <v-navigation-drawer
       :mini-variant="mini"
       v-model="drawer"
@@ -23,7 +23,7 @@
       </v-list>
     </v-navigation-drawer>
     <v-layout row wrap justify-center align-center>
-      <v-flex text-xs-center xs12>
+      <v-flex xs12>
         <component :is="currentItemComponent">
           <h1 slot="title">{{ title }}</h1>
         </component>

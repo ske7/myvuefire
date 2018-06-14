@@ -1,7 +1,11 @@
 <template>
-  <v-container>
-    <slot name="title"/>
-  </v-container>
+  <div>
+    <v-layout row>
+      <v-flex text-xs-center>
+        <slot name="title" />
+      </v-flex>
+    </v-layout>
+  </div>
 </template>
 
 <script>

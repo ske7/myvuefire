@@ -1,7 +1,11 @@
 <template>
   <div>
-    <slot name="title" />
-    <v-data-table :headers="headers" :items="items" :loading="dataloading" :rows-per-page-items="[10, 20]" class="elevation-1 mt-2">
+    <v-layout row>
+      <v-flex text-xs-center>
+        <slot name="title" />
+      </v-flex>
+    </v-layout>
+    <v-data-table :headers="headers" :items="items" :loading="dataloading" :rows-per-page-items="[10, 20]" class="elevation-1 mt-1">
       <template slot="headerCell" slot-scope="props">
         <span>
           {{ props.header.text }}
@@ -31,6 +35,12 @@
                   <v-icon color="pink">delete</v-icon>
                 </v-btn>
                 <span>Delete user profile</span>
+              </v-tooltip>
+              <v-tooltip top>
+                <v-btn slot="activator" icon class="mx-0">
+                  <v-icon color="blue">book</v-icon>
+                </v-btn>
+                <span>Show users logins</span>
               </v-tooltip>
             </v-layout>
           </v-container>
