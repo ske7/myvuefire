@@ -45,11 +45,7 @@
         @cancel-dialog="deleteprofiledialog = false"
         @accept-question="deleteUserProfile()" />
     </keep-alive>
-    <v-layout v-if="error" row>
-      <v-flex xs12 sm6 offset-sm3 mt-1>
-        <app-alert :text="error.message" @dismissed="onDismissed" />
-      </v-flex>
-    </v-layout>
+    <app-alertpop :toggle="!!error" :error="error" @dismissed="onDismissed()"/>
   </div>
 </template>
 

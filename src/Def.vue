@@ -94,6 +94,7 @@
       </v-content>
     </v-jumbotron>
     <app-footer app/>
+    <app-alertpop :toggle="!!error" :error="error" @dismissed="onDismissed()"/>
   </v-app>
 </template>
 
@@ -107,6 +108,11 @@ export default {
   components: {
     appHeader: DefHeader,
     appFooter: Footer
+  },
+  data() {
+    return {
+      error: null
+    };
   },
   computed: {
     isLoading() {
@@ -159,24 +165,27 @@ export default {
     reload() {
       location.reload();
     },
+    onDismissed() {
+      this.error = null;
+    },
     onSignupWithGoogle() {
       db.signInWithGoogleAuthProvider().catch((error) => {
-        alert(error);
+        this.error = error;
       });
     },
     onSignupWithFacebook() {
       db.signInWithFacebookAuthProvider().catch((error) => {
-        alert(error);
+        this.error = error;
       });
     },
     onSignupWithTwitter() {
       db.signInWithTwitterAuthProvider().catch((error) => {
-        alert(error);
+        this.error = error;
       });
     },
     onSignupWithGithub() {
       db.signInWithGithubAuthProvider().catch((error) => {
-        alert(error);
+        this.error = error;
       });
     }
   }
