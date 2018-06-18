@@ -46,6 +46,26 @@ function deleteQueryBatch(query, batchSize, resolve, reject) {
     .catch(reject);
 }
 
+function listAllUsers(nextPageToken) {
+  let users = [];
+
+  return admin
+    .auth()
+    .listUsers(1000, nextPageToken)
+    .then((listUsersResult) => {
+      listUsersResult.users.forEach((userRecord) => {
+        users.push(userRecord.toJSON());
+      });
+      if (listUsersResult.pageToken) {
+        listAllUsers(listUsersResult.pageToken);
+      }
+      return users;
+    })
+    .catch((error) => {
+      return error;
+    });
+}
+
 // Functions to export
 const deleteUserProfile = functions.https.onCall((data, context) => {
   return admin
@@ -88,8 +108,21 @@ const modifyLockOfUser = functions.https.onCall((data, context) => {
     });
 });
 
+const getUsers = functions.https.onCall((data, context) => {
+  return listAllUsers()
+    .then((resUsers) => {
+      return { users: resUsers };
+    })
+    .catch((error) => {
+      console.log("Error listing users:", error);
+      throw new functions.https.HttpsError("internal", "Error listing users: " + error.message);
+    });
+});
+
+
 // Exports
 module.exports = {
   deleteUserProfile,
-  modifyLockOfUser
+  modifyLockOfUser,
+  getUsers
 };
