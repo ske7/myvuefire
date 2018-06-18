@@ -93,28 +93,53 @@ export default {
     this.$store.dispatch("clearError");
     this.dataloading = true;
     let arr = [];
-    db.firestore.collection("users").get().then((querySnapshot) => {
-      querySnapshot.forEach((doc) => {
-        arr = doc.data();
+    const getUsers = db.firefunctions.httpsCallable("getUsers");
+
+    getUsers().then((result) => {
+      result.data.users.forEach((user) => {
+        arr = user;
         const arr2 = {};
         Object.keys(arr).forEach((key) => {
-          var value = arr[key];
-          arr2[key] = value;
+          const value = arr[key];
+
+          if (key === "email" || key === "displayName") {
+            arr2[key] = value;
+          }
           if (value === true) {
             arr2[key] = "yes";
           }
-          if ((value === false) || (value === "")) {
+          if (value === false) {
             arr2[key] = "-";
+          }
+          if (key === "metadata") {
+            arr2["creationTime"] = value["creationTime"];
+            arr2["lastSignInTime"] = value["lastSignInTime"];
+          }
+          if (key === "providerData") {
+            const arr3 = [];
+            for (const [key] in value) {
+              arr3.push(value[key].providerId);
+            }
+            arr2["providerId"] = arr3.join(", ");
+          }
+          if (key === "email" && this.$store.state.confData.adminemail === value) {
+            arr2["isAdmin"] = "yes";
           }
         });
         this.items.push(arr2);
       });
-    }).then(() => {
       this.dataloading = false;
+    }).catch((error) => {
+      this.dataloading = false;
+      this.$store.commit("setError", error);
     });
   },
   methods: {
     lockUser(editedItem) {
+      if (editedItem.isAdmin === "yes") {
+        alert("Cannot disable user with admin rights");
+        return;
+      }
       this.isProcessing = true;
       const isDisable = (editedItem.disabled !== "yes");
       const editedIndex = this.items.indexOf(editedItem);
@@ -135,6 +160,10 @@ export default {
       this.$store.dispatch("clearError");
     },
     onTryToDeleteUserProfile(propsItem) {
+      if (propsItem.isAdmin === "yes") {
+        alert("Cannot delete user profile with admin rights");
+        return;
+      }
       this.deleteprofiledialog = true;
       this.propsItem = propsItem;
     },
