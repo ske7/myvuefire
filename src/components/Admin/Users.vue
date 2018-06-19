@@ -55,7 +55,7 @@
         @cancel-dialog="deleteprofiledialog = false"
         @accept-question="deleteUserProfile()" />
     </keep-alive>
-    <app-alertpop :toggle="!!error" :error="error" @dismissed="onDismissed()"/>
+    <app-alertpop :toggle="!!error || !!info" :error="error" :info="info" @dismissed="onDismissed()"/>
   </div>
 </template>
 
@@ -87,6 +87,9 @@ export default {
   computed: {
     error() {
       return this.$store.getters.error;
+    },
+    info() {
+      return this.$store.getters.info;
     }
   },
   created() {
@@ -102,15 +105,20 @@ export default {
         Object.keys(arr).forEach((key) => {
           const value = arr[key];
 
-          if (key === "email" || key === "displayName") {
+          if (key === "email" ||
+              key === "displayName" ||
+              key === "uid" ||
+              key === "disabled" ||
+              key === "emailVerified") {
             arr2[key] = value;
+            if (value === true) {
+              arr2[key] = "yes";
+            }
+            if (value === false) {
+              arr2[key] = "-";
+            }
           }
-          if (value === true) {
-            arr2[key] = "yes";
-          }
-          if (value === false) {
-            arr2[key] = "-";
-          }
+
           if (key === "metadata") {
             arr2["creationTime"] = value["creationTime"];
             arr2["lastSignInTime"] = value["lastSignInTime"];
@@ -122,8 +130,13 @@ export default {
             }
             arr2["providerId"] = arr3.join(", ");
           }
-          if (key === "email" && this.$store.state.confData.adminemail === value) {
-            arr2["isAdmin"] = "yes";
+
+          if (key === "email") {
+            if (this.$store.state.confData.adminemail === value) {
+              arr2["isAdmin"] = "yes";
+            } else {
+              arr2["isAdmin"] = "-";
+            }
           }
         });
         this.items.push(arr2);
@@ -137,7 +150,7 @@ export default {
   methods: {
     lockUser(editedItem) {
       if (editedItem.isAdmin === "yes") {
-        alert("Cannot disable user with admin rights");
+        this.$store.commit("setInfo", "Cannot disable user with admin rights");
         return;
       }
       this.isProcessing = true;
@@ -158,10 +171,11 @@ export default {
     },
     onDismissed() {
       this.$store.dispatch("clearError");
+      this.$store.dispatch("clearInfo");
     },
     onTryToDeleteUserProfile(propsItem) {
       if (propsItem.isAdmin === "yes") {
-        alert("Cannot delete user profile with admin rights");
+        this.$store.commit("setInfo", "Cannot delete user with admin rights");
         return;
       }
       this.deleteprofiledialog = true;
