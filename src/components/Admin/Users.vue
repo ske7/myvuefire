@@ -5,7 +5,13 @@
         <slot name="title" />
       </v-flex>
     </v-layout>
-    <v-data-table :headers="headers" :items="items" :loading="dataloading" :rows-per-page-items="[10, 20]" class="elevation-1 mt-1">
+    <v-data-table :headers="headers"
+                  :items="items"
+                  :loading="dataloading"
+                  :rows-per-page-items="[5, 10, 20]"
+                  :pagination.sync="pagination"
+                  :custom-sort="customSort"
+                  class="elevation-1 mt-1">
       <template slot="headerCell" slot-scope="props">
         <span>
           {{ props.header.text }}
@@ -13,10 +19,10 @@
       </template>
       <v-progress-linear slot="progress" :indeterminate="dataloading" color="blue" />
       <template slot="items" slot-scope="props">
-        <td class="text-xs-left">{{ props.item.displayName }}</td>
         <td class="text-xs-left">{{ props.item.email }}</td>
-        <td class="text-xs-center">{{ props.item.creationTime }}</td>
-        <td class="text-xs-center">{{ props.item.lastSignInTime }}</td>
+        <td class="text-xs-left">{{ props.item.displayName }}</td>
+        <td class="text-xs-center">{{ props.item.creationTime | formatDate }}</td>
+        <td class="text-xs-center">{{ props.item.lastSignInTime | formatDate }}</td>
         <td class="text-xs-center">{{ props.item.providerId }}</td>
         <td class="text-xs-center">{{ props.item.isAdmin }}</td>
         <td class="text-xs-center">{{ props.item.emailVerified }}</td>
@@ -64,15 +70,38 @@ import db from "@/dbfunc/db";
 
 export default {
   name: "Users",
+  filters: {
+    formatDate(date) {
+      if (date === null || date === undefined || date === "") {
+        return "";
+      }
+      const option = {
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit",
+        hour12: false,
+        timeZone: "UTC"
+      };
+      return new Date(Date.parse(date)).toLocaleDateString("en-GB", option);
+    }
+  },
   data() {
     return {
       dataloading: true,
       isProcessing: false,
       deleteprofiledialog: false,
       propsItem: null,
+      pagination: {
+        sortBy: "creationTime",
+        descending: true,
+        rowsPerPage: 10
+      },
       headers: [
-        { text: "User name", align: "left", value: "displayName" },
         { text: "Email", value: "email", align: "left" },
+        { text: "User name", align: "left", value: "displayName" },
         { text: "Created", value: "creationTime", align: "center" },
         { text: "Signed In", value: "lastSignInTime", align: "center" },
         { text: "Provider", value: "providerId", align: "center" },
@@ -148,6 +177,44 @@ export default {
     });
   },
   methods: {
+    customSort(items, index, desc) {
+      const modifier = (desc ? -1 : 1);
+      return items.sort((var1, var2) => {
+        if (!index) {
+          return 0;
+        }
+
+        let val1 = var1[index];
+        let val2 = var2[index];
+
+        if (index === "creationTime" || index === "lastSignInTime") {
+          if (val1 === null || val1 === undefined) {
+            val1 = 0;
+          } else {
+            val1 = Date.parse(val1);
+          }
+          if (val2 === null || val2 === undefined) {
+            val2 = 0;
+          } else {
+            val2 = Date.parse(val2);
+          }
+        }
+
+        if (val1 === null || val1 === undefined) {
+          val1 = "";
+        }
+
+        if (val2 === null || val2 === undefined) {
+          val2 = "";
+        }
+
+        if (isFinite(val1) && isFinite(val2)) {
+          return modifier * (val1 - val2);
+        }
+
+        return modifier * val1.toString().localeCompare(val2);
+      });
+    },
     lockUser(editedItem) {
       if (editedItem.isAdmin === "yes") {
         this.$store.commit("setInfo", "Cannot disable user with admin rights");
