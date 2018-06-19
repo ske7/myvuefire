@@ -1,8 +1,10 @@
 <template>
-  <v-dialog v-model="toggle" max-width="280" persistent transition="fade-transition">
+  <v-dialog v-model="toggle" max-width="320" persistent transition="fade-transition">
     <v-card>
       <v-layout row justify-center align-center>
-        <v-card-title class="subheading text-xs-center"> {{ message }}</v-card-title>
+        <v-card-title class="subheading text-xs-center">
+          <v-alert :value="true" :color="btnColor" :icon="icon" outline>{{ message }}</v-alert>
+        </v-card-title>
       </v-layout>
       <v-layout row justify-center align-center>
         <v-flex text-xs-center mb-2>
@@ -22,6 +24,11 @@ export default {
       default: null,
       required: false
     },
+    info: {
+      type: String,
+      default: "",
+      required: false
+    },
     initmessage: {
       type: String,
       default: "",
@@ -36,7 +43,8 @@ export default {
   data() {
     return {
       message: this.initmessage,
-      btnColor: ""
+      btnColor: "",
+      icon: null
     };
   },
   watch: {
@@ -44,10 +52,16 @@ export default {
       if (this.toggle) {
         if (this.error !== null && this.error.message !== "" & this.initmessage === "") {
           this.message = this.error.message;
-          this.btnColor = "red darken-5";
+          this.btnColor = "error";
+          this.icon = "error";
+        } else if (this.info !== "" & this.initmessage === "") {
+          this.message = this.info;
+          this.btnColor = "info";
+          this.icon = "info";
         } else {
           this.message = this.initmessage;
           this.btnColor = "green darken-5";
+          this.icon = null;
         }
       }
     }
