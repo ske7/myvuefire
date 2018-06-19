@@ -3,12 +3,11 @@
     <v-navigation-drawer
       :mini-variant="mini"
       v-model="drawer"
+      :stateless="$vuetify.breakpoint.mdAndDown"
       clipped
       app
-      permanent
       hide-overlay
-      mini-variant-width="80"
-      absolute>
+      mini-variant-width="80">
       <v-list class="pt-0" dense>
         <v-flex fluid>
           <v-list-tile v-for="item in items" :key="item.id" :class="{selected : selectedid === item.id}" @click="chooseAdminPage(item.id)">
@@ -43,7 +42,6 @@ export default {
   },
   data() {
     return {
-      drawer: true,
       mini: true,
       selectedid: 0,
       currentItemComponent: "Config",
@@ -53,6 +51,11 @@ export default {
       ],
       title: "Admin panel!"
     };
+  },
+  computed: {
+    drawer() {
+      return this.$store.state.adminDrawer || !this.$vuetify.breakpoint.mdAndDown;
+    }
   },
   created() {
     this.$store.dispatch("clearError");

@@ -19,7 +19,8 @@ export const store = new Vuex.Store({
     error: null,
     confData: null,
     ip: "0.0.0.0",
-    ipdata: null
+    ipdata: null,
+    adminDrawer: null
   },
 
   mutations: {
@@ -82,6 +83,9 @@ export const store = new Vuex.Store({
         arr.push(payload[key].providerId);
       }
       db.updateUserProviderId(state.user.uid, arr.join(", "));
+    },
+    adminDrawerToggle(state, payload) {
+      state.adminDrawer = !state.adminDrawer;
     }
   },
 

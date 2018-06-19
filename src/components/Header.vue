@@ -1,5 +1,8 @@
 <template>
   <v-toolbar color="indigo" dark fixed app clipped-left dense>
+    <v-toolbar-side-icon
+      v-show="$vuetify.breakpoint.mdAndDown && needToShowSideIcon"
+      @click="$store.commit('adminDrawerToggle')"/>
     <v-toolbar-items color="indigo" dark>
       <v-btn
         color="indigo"
@@ -90,6 +93,9 @@ export default {
     };
   },
   computed: {
+    needToShowSideIcon() {
+      return this.$route.name === "Admin";
+    },
     userIsAuthenticated() {
       return (
         this.$store.getters.user !== null &&
