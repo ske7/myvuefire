@@ -43,7 +43,7 @@
                 <span>Delete user profile</span>
               </v-tooltip>
               <v-tooltip top>
-                <v-btn slot="activator" icon class="mx-0">
+                <v-btn slot="activator" icon class="mx-0" @click="onShowUserLogins(props.item)">
                   <v-icon color="blue">book</v-icon>
                 </v-btn>
                 <span>Show users logins</span>
@@ -62,37 +62,48 @@
         @accept-question="deleteUserProfile()" />
     </keep-alive>
     <app-alertpop :toggle="!!error || !!info" :error="error" :info="info" @dismissed="onDismissed()"/>
+    <v-dialog v-model="showUserLogins" persistent full-width hide-overlay scrollable fullscreen transition="slide-y-transition">
+      <v-container fill-height fluid>
+        <v-layout row wrap justify-center align-center>
+          <v-card class="blue-border-small" flat>
+            <v-layout row justify-center align-center>
+              <v-card-title primary-title class="headline blue--text text--darken-4 justify-center">
+                User logins
+              </v-card-title>
+            </v-layout>
+            <v-layout row wrap justify-center align-center ml-3 mr-3 mb-3>
+              <v-flex xs12>
+                <app-user-logins :uid="propsItem ? propsItem.uid : ''"/>
+              </v-flex>
+            </v-layout>
+            <v-layout row justify-center align-center>
+              <v-flex text-xs-center mb-3>
+                <v-btn small color="green darken-5" outline @click.native="showUserLogins = false">Close</v-btn>
+              </v-flex>
+            </v-layout>
+          </v-card>
+        </v-layout>
+      </v-container>
+    </v-dialog>
   </div>
 </template>
 
 <script>
 import db from "@/dbfunc/db";
+import mixins from "@/helpers/mixins";
 
 export default {
   name: "Users",
-  filters: {
-    formatDate(date) {
-      if (date === null || date === undefined || date === "") {
-        return "";
-      }
-      const option = {
-        year: "numeric",
-        month: "2-digit",
-        day: "2-digit",
-        hour: "2-digit",
-        minute: "2-digit",
-        second: "2-digit",
-        hour12: false,
-        timeZone: "UTC"
-      };
-      return new Date(Date.parse(date)).toLocaleDateString("en-GB", option);
-    }
+  components: {
+    appUserLogins: () => import("./UserLogins.vue")
   },
+  mixins: [mixins.dataTableMixin],
   data() {
     return {
       dataloading: true,
       isProcessing: false,
       deleteprofiledialog: false,
+      showUserLogins: false,
       propsItem: null,
       pagination: {
         sortBy: "creationTime",
@@ -110,7 +121,8 @@ export default {
         { text: "Locked", value: "disabled", align: "center" },
         { text: "Actions", value: "name", align: "center", sortable: false }
       ],
-      items: []
+      items: [],
+      dateColumns: ["creationTime", "lastSignInTime"]
     };
   },
   computed: {
@@ -177,44 +189,6 @@ export default {
     });
   },
   methods: {
-    customSort(items, index, desc) {
-      const modifier = (desc ? -1 : 1);
-      return items.sort((var1, var2) => {
-        if (!index) {
-          return 0;
-        }
-
-        let val1 = var1[index];
-        let val2 = var2[index];
-
-        if (index === "creationTime" || index === "lastSignInTime") {
-          if (val1 === null || val1 === undefined) {
-            val1 = 0;
-          } else {
-            val1 = Date.parse(val1);
-          }
-          if (val2 === null || val2 === undefined) {
-            val2 = 0;
-          } else {
-            val2 = Date.parse(val2);
-          }
-        }
-
-        if (val1 === null || val1 === undefined) {
-          val1 = "";
-        }
-
-        if (val2 === null || val2 === undefined) {
-          val2 = "";
-        }
-
-        if (isFinite(val1) && isFinite(val2)) {
-          return modifier * (val1 - val2);
-        }
-
-        return modifier * val1.toString().localeCompare(val2);
-      });
-    },
     lockUser(editedItem) {
       if (editedItem.isAdmin === "yes") {
         this.$store.commit("setInfo", "Cannot disable user with admin rights");
@@ -263,6 +237,10 @@ export default {
         this.isProcessing = false;
         this.$store.commit("setError", error);
       });
+    },
+    onShowUserLogins(propsItem) {
+      this.propsItem = propsItem;
+      this.showUserLogins = true;
     }
   }
 };
