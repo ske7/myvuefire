@@ -1,12 +1,12 @@
 <template>
-  <div>
-    <v-layout row>
-      <v-flex text-xs-center>
+  <div style="width: 100%; max-width: 100%;">
+    <v-layout row wrap>
+      <v-flex xs12 text-xs-center>
         <slot name="title" />
       </v-flex>
     </v-layout>
-    <v-layout row>
-      <v-flex xs2 mb-1>
+    <v-layout row wrap>
+      <v-flex xs1 text-xs-left>
         <v-tooltip right open-delay="600">
           <v-btn slot="activator"
                  absolute
@@ -22,56 +22,54 @@
         </v-tooltip>
       </v-flex>
     </v-layout>
-    <v-layout row>
-      <v-data-table :headers="headers"
-                    :items="items"
-                    :loading="dataloading"
-                    :rows-per-page-items="[5, 10, 20]"
-                    :pagination.sync="pagination"
-                    :custom-sort="customSort"
-                    class="elevation-1 mt-1">
-        <template slot="headerCell" slot-scope="props">
-          <span>
-            {{ props.header.text }}
-          </span>
-        </template>
-        <v-progress-linear slot="progress" :indeterminate="dataloading" color="blue" />
-        <template slot="items" slot-scope="props">
-          <td class="text-xs-left">{{ props.item.email }}</td>
-          <td class="text-xs-left">{{ props.item.displayName }}</td>
-          <td class="text-xs-center">{{ props.item.creationTime | formatDate }}</td>
-          <td class="text-xs-center">{{ props.item.lastSignInTime | formatDate }}</td>
-          <td class="text-xs-center">{{ props.item.providerId }}</td>
-          <td class="text-xs-center">{{ props.item.isAdmin }}</td>
-          <td class="text-xs-center">{{ props.item.emailVerified }}</td>
-          <td class="text-xs-center">{{ props.item.disabled }}</td>
-          <td class="text-xs-center justify-center layout px-0">
-            <v-container justify-center align-center>
-              <v-layout row>
-                <v-tooltip top>
-                  <v-btn slot="activator" icon class="mx-0" @click="lockUser(props.item)">
-                    <v-icon color="yellow darken-1">{{ props.item.disabled === "yes" ? "lock" : "lock_open" }}</v-icon>
-                  </v-btn>
-                  <span>{{ props.item.disabled === "yes" ? "Unlock user" : "Lock user" }}</span>
-                </v-tooltip>
-                <v-tooltip top>
-                  <v-btn slot="activator" icon class="mx-0" @click="onTryToDeleteUserProfile(props.item)">
-                    <v-icon color="pink">delete</v-icon>
-                  </v-btn>
-                  <span>Delete user profile</span>
-                </v-tooltip>
-                <v-tooltip top>
-                  <v-btn slot="activator" icon class="mx-0" @click="onShowUserLogins(props.item)">
-                    <v-icon color="blue">book</v-icon>
-                  </v-btn>
-                  <span>Show users logins</span>
-                </v-tooltip>
-              </v-layout>
-            </v-container>
-          </td>
-        </template>
-      </v-data-table>
-    </v-layout>
+    <v-data-table :headers="headers"
+                  :items="items"
+                  :loading="dataloading"
+                  :rows-per-page-items="[5, 10, 20]"
+                  :pagination.sync="pagination"
+                  :custom-sort="customSort"
+                  class="elevation-1 mt-1">
+      <template slot="headerCell" slot-scope="props">
+        <span>
+          {{ props.header.text }}
+        </span>
+      </template>
+      <v-progress-linear slot="progress" :indeterminate="dataloading" color="blue" />
+      <template slot="items" slot-scope="props">
+        <td class="text-xs-left">{{ props.item.email }}</td>
+        <td class="text-xs-left">{{ props.item.displayName }}</td>
+        <td class="text-xs-center">{{ props.item.creationTime | formatDate }}</td>
+        <td class="text-xs-center">{{ props.item.lastSignInTime | formatDate }}</td>
+        <td class="text-xs-center">{{ props.item.providerId }}</td>
+        <td class="text-xs-center">{{ props.item.isAdmin }}</td>
+        <td class="text-xs-center">{{ props.item.emailVerified }}</td>
+        <td class="text-xs-center">{{ props.item.disabled }}</td>
+        <td class="text-xs-center justify-center layout px-0">
+          <v-container justify-center align-center>
+            <v-layout row>
+              <v-tooltip top>
+                <v-btn slot="activator" icon class="mx-0" @click="lockUser(props.item)">
+                  <v-icon color="yellow darken-1">{{ props.item.disabled === "yes" ? "lock" : "lock_open" }}</v-icon>
+                </v-btn>
+                <span>{{ props.item.disabled === "yes" ? "Unlock user" : "Lock user" }}</span>
+              </v-tooltip>
+              <v-tooltip top>
+                <v-btn slot="activator" icon class="mx-0" @click="onTryToDeleteUserProfile(props.item)">
+                  <v-icon color="pink">delete</v-icon>
+                </v-btn>
+                <span>Delete user profile</span>
+              </v-tooltip>
+              <v-tooltip top>
+                <v-btn slot="activator" icon class="mx-0" @click="onShowUserLogins(props.item)">
+                  <v-icon color="blue">book</v-icon>
+                </v-btn>
+                <span>Show users logins</span>
+              </v-tooltip>
+            </v-layout>
+          </v-container>
+        </td>
+      </template>
+    </v-data-table>
     <app-processing :is-processing="isProcessing" />
     <keep-alive>
       <app-yescanceldlg

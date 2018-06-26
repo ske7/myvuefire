@@ -2,7 +2,7 @@
   <v-container fluid fill-height>
     <v-navigation-drawer
       :mini-variant="mini"
-      v-model="drawer"
+      :value="drawer"
       :stateless="$vuetify.breakpoint.mdAndDown"
       clipped
       app
@@ -15,19 +15,17 @@
               <v-icon>{{ item.icon }}</v-icon>
             </v-list-tile-action>
             <v-list-tile-content>
-              <v-list-tile-title>{{ item.title }}</v-list-tile-title>
+              <v-list-tile-title>
+                {{ item.title }}
+              </v-list-tile-title>
             </v-list-tile-content>
           </v-list-tile>
         </v-flex>
       </v-list>
     </v-navigation-drawer>
-    <v-layout row wrap justify-center align-center>
-      <v-flex xs12>
-        <component :is="currentItemComponent">
-          <h1 slot="title">{{ title }}</h1>
-        </component>
-      </v-flex>
-    </v-layout>
+    <component :is="currentItemComponent">
+      <h1 slot="title">{{ title }}</h1>
+    </component>
   </v-container>
 </template>
 
