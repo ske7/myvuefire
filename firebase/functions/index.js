@@ -119,10 +119,31 @@ const getUsers = functions.https.onCall((data, context) => {
     });
 });
 
+const createUser = functions.https.onCall((data, context) => {
+  return admin
+    .auth()
+    .createUser({
+      email: data.email,
+      emailVerified: false,
+      password: data.password,
+      displayName: data.displayName,
+      disabled: false
+    })
+    .then((userRecord) => {
+      console.log("Successfully created new user:", userRecord.uid);
+      return { done: true, message: `Successfully created new user: ${userRecord.uid}`, user: userRecord };
+    })
+    .catch((error) => {
+      console.log("Error creating user:", error);
+      throw new functions.https.HttpsError("internal", "Error creating user: " + error.message);
+    });
+});
+
 
 // Exports
 module.exports = {
   deleteUserProfile,
   modifyLockOfUser,
-  getUsers
+  getUsers,
+  createUser
 };
