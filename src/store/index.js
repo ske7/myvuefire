@@ -17,6 +17,7 @@ export const store = new Vuex.Store({
     signUpProcess: false,
     imgloading: false,
     error: null,
+    errorDialog: null,
     info: null,
     confData: null,
     ip: "0.0.0.0",
@@ -48,6 +49,12 @@ export const store = new Vuex.Store({
     },
     clearError(state) {
       state.error = null;
+    },
+    setErrorDialog(state, payload) {
+      state.errorDialog = payload;
+    },
+    clearErrorDialog(state) {
+      state.errorDialog = null;
     },
     setInfo(state, payload) {
       state.info = payload;
@@ -121,13 +128,13 @@ export const store = new Vuex.Store({
                   displayName: payload.displayName,
                   photoURL: "",
                   providerId: "password",
-                  isAdmin:
-                           state.confData.adminemail === user.email
+                  isAdmin: state.confData.adminemail === user.email
                 };
                 db.addUser(
                   user,
                   newUser.isAdmin,
-                  "password"
+                  "password",
+                  false
                 ).then(() => {
                   resolve(newUser);
                 });
@@ -221,7 +228,8 @@ export const store = new Vuex.Store({
           db.addUser(
             user,
             state.confData.adminemail === user.email,
-            payload.redirectResult.additionalUserInfo.providerId
+            payload.redirectResult.additionalUserInfo.providerId,
+            false
           );
         } else {
           commit("updateProviderID", user.providerData);
@@ -253,6 +261,9 @@ export const store = new Vuex.Store({
     },
     clearError({ commit }) {
       commit("clearError");
+    },
+    clearErrorDialog({ commit }) {
+      commit("clearErrorDialog");
     },
     clearInfo({ commit }) {
       commit("clearInfo");
@@ -493,6 +504,9 @@ export const store = new Vuex.Store({
     },
     error(state) {
       return state.error;
+    },
+    errorDialog(state) {
+      return state.errorDialog;
     },
     info(state) {
       return state.info;
