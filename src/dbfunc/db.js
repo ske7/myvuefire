@@ -51,7 +51,7 @@ function signInWithTwitterAuthProvider() {
   return firebase.auth().signInWithRedirect(provider);
 }
 
-function addUser(user, isAdmin, extproviderId) {
+function addUser(user, isAdmin, extproviderId, byAdmin) {
   return new Promise((resolve, reject) => {
     const userRef = firestore.collection("users").doc(user.uid);
     userRef
@@ -68,26 +68,28 @@ function addUser(user, isAdmin, extproviderId) {
         disabled: false
       })
       .then(() => {
-        userRef.collection("logins").add({
-          loginTime: user.metadata.lastSignInTime,
-          emailVerified: user.emailVerified,
-          providerId:
+        if (byAdmin === false) {
+          userRef.collection("logins").add({
+            loginTime: user.metadata.lastSignInTime,
+            emailVerified: user.emailVerified,
+            providerId:
             extproviderId !== undefined ? extproviderId : user.providerId,
-          userip: store.state.ip,
-          country:
+            userip: store.state.ip,
+            country:
             store.state.ipdata !== null
               ? store.state.ipdata.country_name
               : null,
-          city: store.state.ipdata !== null ? store.state.ipdata.city : null,
-          timezone:
+            city: store.state.ipdata !== null ? store.state.ipdata.city : null,
+            timezone:
             store.state.ipdata !== null ? store.state.ipdata.timezone : null,
-          utc_offset:
+            utc_offset:
             store.state.ipdata !== null ? store.state.ipdata.utc_offset : null,
-          latitude:
+            latitude:
             store.state.ipdata !== null ? store.state.ipdata.latitude : null,
-          longitude:
+            longitude:
             store.state.ipdata !== null ? store.state.ipdata.longitude : null
-        });
+          });
+        }
         resolve(userRef);
       })
       .catch((error) => {
