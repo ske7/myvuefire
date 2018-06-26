@@ -5,54 +5,73 @@
         <slot name="title" />
       </v-flex>
     </v-layout>
-    <v-data-table :headers="headers"
-                  :items="items"
-                  :loading="dataloading"
-                  :rows-per-page-items="[5, 10, 20]"
-                  :pagination.sync="pagination"
-                  :custom-sort="customSort"
-                  class="elevation-1 mt-1">
-      <template slot="headerCell" slot-scope="props">
-        <span>
-          {{ props.header.text }}
-        </span>
-      </template>
-      <v-progress-linear slot="progress" :indeterminate="dataloading" color="blue" />
-      <template slot="items" slot-scope="props">
-        <td class="text-xs-left">{{ props.item.email }}</td>
-        <td class="text-xs-left">{{ props.item.displayName }}</td>
-        <td class="text-xs-center">{{ props.item.creationTime | formatDate }}</td>
-        <td class="text-xs-center">{{ props.item.lastSignInTime | formatDate }}</td>
-        <td class="text-xs-center">{{ props.item.providerId }}</td>
-        <td class="text-xs-center">{{ props.item.isAdmin }}</td>
-        <td class="text-xs-center">{{ props.item.emailVerified }}</td>
-        <td class="text-xs-center">{{ props.item.disabled }}</td>
-        <td class="text-xs-center justify-center layout px-0">
-          <v-container justify-center align-center>
-            <v-layout row>
-              <v-tooltip top>
-                <v-btn slot="activator" icon class="mx-0" @click="lockUser(props.item)">
-                  <v-icon color="yellow darken-1">{{ props.item.disabled === "yes" ? "lock" : "lock_open" }}</v-icon>
-                </v-btn>
-                <span>{{ props.item.disabled === "yes" ? "Unlock user" : "Lock user" }}</span>
-              </v-tooltip>
-              <v-tooltip top>
-                <v-btn slot="activator" icon class="mx-0" @click="onTryToDeleteUserProfile(props.item)">
-                  <v-icon color="pink">delete</v-icon>
-                </v-btn>
-                <span>Delete user profile</span>
-              </v-tooltip>
-              <v-tooltip top>
-                <v-btn slot="activator" icon class="mx-0" @click="onShowUserLogins(props.item)">
-                  <v-icon color="blue">book</v-icon>
-                </v-btn>
-                <span>Show users logins</span>
-              </v-tooltip>
-            </v-layout>
-          </v-container>
-        </td>
-      </template>
-    </v-data-table>
+    <v-layout row>
+      <v-flex xs2 mb-1>
+        <v-tooltip right open-delay="600">
+          <v-btn slot="activator"
+                 absolute
+                 top
+                 fab
+                 small
+                 color="blue darken-4"
+                 dark
+                 @click="onTryToAddUserProfile()">
+            <v-icon>add</v-icon>
+          </v-btn>
+          <span>Add user profile</span>
+        </v-tooltip>
+      </v-flex>
+    </v-layout>
+    <v-layout row>
+      <v-data-table :headers="headers"
+                    :items="items"
+                    :loading="dataloading"
+                    :rows-per-page-items="[5, 10, 20]"
+                    :pagination.sync="pagination"
+                    :custom-sort="customSort"
+                    class="elevation-1 mt-1">
+        <template slot="headerCell" slot-scope="props">
+          <span>
+            {{ props.header.text }}
+          </span>
+        </template>
+        <v-progress-linear slot="progress" :indeterminate="dataloading" color="blue" />
+        <template slot="items" slot-scope="props">
+          <td class="text-xs-left">{{ props.item.email }}</td>
+          <td class="text-xs-left">{{ props.item.displayName }}</td>
+          <td class="text-xs-center">{{ props.item.creationTime | formatDate }}</td>
+          <td class="text-xs-center">{{ props.item.lastSignInTime | formatDate }}</td>
+          <td class="text-xs-center">{{ props.item.providerId }}</td>
+          <td class="text-xs-center">{{ props.item.isAdmin }}</td>
+          <td class="text-xs-center">{{ props.item.emailVerified }}</td>
+          <td class="text-xs-center">{{ props.item.disabled }}</td>
+          <td class="text-xs-center justify-center layout px-0">
+            <v-container justify-center align-center>
+              <v-layout row>
+                <v-tooltip top>
+                  <v-btn slot="activator" icon class="mx-0" @click="lockUser(props.item)">
+                    <v-icon color="yellow darken-1">{{ props.item.disabled === "yes" ? "lock" : "lock_open" }}</v-icon>
+                  </v-btn>
+                  <span>{{ props.item.disabled === "yes" ? "Unlock user" : "Lock user" }}</span>
+                </v-tooltip>
+                <v-tooltip top>
+                  <v-btn slot="activator" icon class="mx-0" @click="onTryToDeleteUserProfile(props.item)">
+                    <v-icon color="pink">delete</v-icon>
+                  </v-btn>
+                  <span>Delete user profile</span>
+                </v-tooltip>
+                <v-tooltip top>
+                  <v-btn slot="activator" icon class="mx-0" @click="onShowUserLogins(props.item)">
+                    <v-icon color="blue">book</v-icon>
+                  </v-btn>
+                  <span>Show users logins</span>
+                </v-tooltip>
+              </v-layout>
+            </v-container>
+          </td>
+        </template>
+      </v-data-table>
+    </v-layout>
     <app-processing :is-processing="isProcessing" />
     <keep-alive>
       <app-yescanceldlg
@@ -62,29 +81,8 @@
         @accept-question="deleteUserProfile()" />
     </keep-alive>
     <app-alertpop :toggle="!!error || !!info" :error="error" :info="info" @dismissed="onDismissed()"/>
-    <v-dialog v-model="showUserLogins" persistent full-width hide-overlay scrollable fullscreen transition="slide-y-transition">
-      <v-container fill-height fluid>
-        <v-layout row wrap justify-center align-center>
-          <v-card class="blue-border-small" flat>
-            <v-layout row justify-center align-center>
-              <v-card-title primary-title class="headline blue--text text--darken-4 justify-center">
-                User logins
-              </v-card-title>
-            </v-layout>
-            <v-layout row wrap justify-center align-center ml-3 mr-3 mb-3>
-              <v-flex xs12>
-                <app-user-logins :uid="propsItem ? propsItem.uid : ''"/>
-              </v-flex>
-            </v-layout>
-            <v-layout row justify-center align-center>
-              <v-flex text-xs-center mb-3>
-                <v-btn small color="green darken-5" outline @click.native="showUserLogins = false">Close</v-btn>
-              </v-flex>
-            </v-layout>
-          </v-card>
-        </v-layout>
-      </v-container>
-    </v-dialog>
+    <app-user-logins :show-user-logins="showUserLogins" :uid="propsItem ? propsItem.uid : ''" @closeform="showUserLogins = false"/>
+    <app-add-user-profile :show-add-user-profile="showAddUserProfile" @closeform="showAddUserProfile = false" @save="onAddUserProfile"/>
   </div>
 </template>
 
@@ -95,7 +93,8 @@ import mixins from "@/helpers/mixins";
 export default {
   name: "Users",
   components: {
-    appUserLogins: () => import("./UserLogins.vue")
+    appUserLogins: () => import("./UserLogins.vue"),
+    appAddUserProfile: () => import("./AddUserProfile.vue")
   },
   mixins: [mixins.dataTableMixin],
   data() {
@@ -104,6 +103,7 @@ export default {
       isProcessing: false,
       deleteprofiledialog: false,
       showUserLogins: false,
+      showAddUserProfile: false,
       propsItem: null,
       pagination: {
         sortBy: "creationTime",
@@ -112,7 +112,7 @@ export default {
       },
       headers: [
         { text: "Email", value: "email", align: "left" },
-        { text: "User name", align: "left", value: "displayName" },
+        { text: "User name", value: "displayName", align: "left" },
         { text: "Created", value: "creationTime", align: "center" },
         { text: "Signed In", value: "lastSignInTime", align: "center" },
         { text: "Provider", value: "providerId", align: "center" },
@@ -136,51 +136,11 @@ export default {
   created() {
     this.$store.dispatch("clearError");
     this.dataloading = true;
-    let arr = [];
     const getUsers = db.firefunctions.httpsCallable("getUsers");
 
     getUsers().then((result) => {
       result.data.users.forEach((user) => {
-        arr = user;
-        const arr2 = {};
-        Object.keys(arr).forEach((key) => {
-          const value = arr[key];
-
-          if (key === "email" ||
-              key === "displayName" ||
-              key === "uid" ||
-              key === "disabled" ||
-              key === "emailVerified") {
-            arr2[key] = value;
-            if (value === true) {
-              arr2[key] = "yes";
-            }
-            if (value === false) {
-              arr2[key] = "-";
-            }
-          }
-
-          if (key === "metadata") {
-            arr2["creationTime"] = value["creationTime"];
-            arr2["lastSignInTime"] = value["lastSignInTime"];
-          }
-          if (key === "providerData") {
-            const arr3 = [];
-            for (const [key] in value) {
-              arr3.push(value[key].providerId);
-            }
-            arr2["providerId"] = arr3.join(", ");
-          }
-
-          if (key === "email") {
-            if (this.$store.state.confData.adminemail === value) {
-              arr2["isAdmin"] = "yes";
-            } else {
-              arr2["isAdmin"] = "-";
-            }
-          }
-        });
-        this.items.push(arr2);
+        this.addRowToTable(user);
       });
       this.dataloading = false;
     }).catch((error) => {
@@ -189,6 +149,49 @@ export default {
     });
   },
   methods: {
+    addRowToTable(user) {
+      const arr = user;
+      const arr2 = {};
+      Object.keys(arr).forEach((key) => {
+        const value = arr[key];
+
+        if (key === "email" ||
+              key === "displayName" ||
+              key === "uid" ||
+              key === "disabled" ||
+              key === "emailVerified") {
+          arr2[key] = value;
+          if (value === true) {
+            arr2[key] = "yes";
+          }
+          if (value === false) {
+            arr2[key] = "-";
+          }
+        }
+
+        if (key === "metadata") {
+          arr2["creationTime"] = value["creationTime"];
+          arr2["lastSignInTime"] = value["lastSignInTime"];
+        }
+        if (key === "providerData") {
+          const arr3 = [];
+          for (const [key] in value) {
+            arr3.push(value[key].providerId);
+          }
+          arr2["providerId"] = arr3.join(", ");
+        }
+
+        if (key === "email") {
+          if (this.$store.state.confData.adminemail === value) {
+            arr2["isAdmin"] = "yes";
+          } else {
+            arr2["isAdmin"] = "-";
+          }
+        }
+      });
+      this.items.push(arr2);
+    },
+
     lockUser(editedItem) {
       if (editedItem.isAdmin === "yes") {
         this.$store.commit("setInfo", "Cannot disable user with admin rights");
@@ -241,6 +244,13 @@ export default {
     onShowUserLogins(propsItem) {
       this.propsItem = propsItem;
       this.showUserLogins = true;
+    },
+    onTryToAddUserProfile() {
+      this.showAddUserProfile = true;
+    },
+    onAddUserProfile(user) {
+      this.showAddUserProfile = false;
+      this.addRowToTable(user);
     }
   }
 };
