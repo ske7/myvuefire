@@ -1,5 +1,5 @@
 <template>
-  <v-container fluid fill-height>
+  <v-container fluid>
     <v-navigation-drawer
       :mini-variant="mini"
       :value="drawer"
@@ -24,7 +24,7 @@
       </v-list>
     </v-navigation-drawer>
     <component :is="currentItemComponent">
-      <h1 slot="title">{{ title }}</h1>
+      <div slot="title" class=" headline blue--text text--darken-4">{{ title }}</div>
     </component>
   </v-container>
 </template>

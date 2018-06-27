@@ -1,15 +1,14 @@
 <template>
   <div style="width: 100%; max-width: 100%;">
-    <v-layout row wrap>
-      <v-flex xs12 text-xs-center>
+    <v-layout row justify-center align-content-center>
+      <v-flex text-xs-center>
         <slot name="title" />
       </v-flex>
     </v-layout>
-    <v-layout row wrap>
-      <v-flex xs1 text-xs-left>
-        <v-tooltip right open-delay="600">
+    <v-layout row justify-space-between align-content-center>
+      <v-flex xs12 text-xs-left>
+        <v-tooltip top open-delay="600">
           <v-btn slot="activator"
-                 absolute
                  top
                  fab
                  small
@@ -19,6 +18,18 @@
             <v-icon>add</v-icon>
           </v-btn>
           <span>Add user profile</span>
+        </v-tooltip>
+        <v-tooltip top open-delay="600">
+          <v-btn slot="activator"
+                 top
+                 fab
+                 small
+                 color="green"
+                 dark
+                 @click="onRefresh()">
+            <v-icon>refresh</v-icon>
+          </v-btn>
+          <span>Refresh</span>
         </v-tooltip>
       </v-flex>
     </v-layout>
@@ -41,32 +52,30 @@
         <td class="text-xs-center">{{ props.item.creationTime | formatDate }}</td>
         <td class="text-xs-center">{{ props.item.lastSignInTime | formatDate }}</td>
         <td class="text-xs-center">{{ props.item.providerId }}</td>
-        <td class="text-xs-center">{{ props.item.isAdmin }}</td>
-        <td class="text-xs-center">{{ props.item.emailVerified }}</td>
-        <td class="text-xs-center">{{ props.item.disabled }}</td>
-        <td class="text-xs-center justify-center layout px-0">
-          <v-container justify-center align-center>
-            <v-layout row>
-              <v-tooltip top>
-                <v-btn slot="activator" icon class="mx-0" @click="lockUser(props.item)">
-                  <v-icon color="yellow darken-1">{{ props.item.disabled === "yes" ? "lock" : "lock_open" }}</v-icon>
-                </v-btn>
-                <span>{{ props.item.disabled === "yes" ? "Unlock user" : "Lock user" }}</span>
-              </v-tooltip>
-              <v-tooltip top>
-                <v-btn slot="activator" icon class="mx-0" @click="onTryToDeleteUserProfile(props.item)">
-                  <v-icon color="pink">delete</v-icon>
-                </v-btn>
-                <span>Delete user profile</span>
-              </v-tooltip>
-              <v-tooltip top>
-                <v-btn slot="activator" icon class="mx-0" @click="onShowUserLogins(props.item)">
-                  <v-icon color="blue">book</v-icon>
-                </v-btn>
-                <span>Show users logins</span>
-              </v-tooltip>
-            </v-layout>
-          </v-container>
+        <td class="text-xs-center mx-0">{{ props.item.isAdmin }}</td>
+        <td class="text-xs-center mx-0">{{ props.item.emailVerified }}</td>
+        <td class="text-xs-center mx-0">{{ props.item.disabled }}</td>
+        <td class="text-xs-center justify-center px-1">
+          <v-layout row>
+            <v-tooltip top>
+              <v-btn slot="activator" class="mx-0" icon @click="lockUser(props.item)">
+                <v-icon color="yellow darken-1">{{ props.item.disabled === "yes" ? "lock" : "lock_open" }}</v-icon>
+              </v-btn>
+              <span>{{ props.item.disabled === "yes" ? "Unlock user" : "Lock user" }}</span>
+            </v-tooltip>
+            <v-tooltip top>
+              <v-btn slot="activator" class="mx-0" icon @click="onTryToDeleteUserProfile(props.item)">
+                <v-icon color="pink">delete</v-icon>
+              </v-btn>
+              <span>Delete user profile</span>
+            </v-tooltip>
+            <v-tooltip top>
+              <v-btn slot="activator" class="mx-0" icon @click="onShowUserLogins(props.item)">
+                <v-icon color="blue">book</v-icon>
+              </v-btn>
+              <span>Show users logins</span>
+            </v-tooltip>
+          </v-layout>
         </td>
       </template>
     </v-data-table>
@@ -132,21 +141,24 @@ export default {
     }
   },
   created() {
-    this.$store.dispatch("clearError");
-    this.dataloading = true;
-    const getUsers = db.firefunctions.httpsCallable("getUsers");
-
-    getUsers().then((result) => {
-      result.data.users.forEach((user) => {
-        this.addRowToTable(user);
-      });
-      this.dataloading = false;
-    }).catch((error) => {
-      this.dataloading = false;
-      this.$store.commit("setError", error);
-    });
+    this.loadData();
   },
   methods: {
+    loadData() {
+      this.$store.dispatch("clearError");
+      this.dataloading = true;
+      const getUsers = db.firefunctions.httpsCallable("getUsers");
+
+      getUsers().then((result) => {
+        result.data.users.forEach((user) => {
+          this.addRowToTable(user);
+        });
+        this.dataloading = false;
+      }).catch((error) => {
+        this.dataloading = false;
+        this.$store.commit("setError", error);
+      });
+    },
     addRowToTable(user) {
       const arr = user;
       const arr2 = {};
@@ -189,7 +201,6 @@ export default {
       });
       this.items.push(arr2);
     },
-
     lockUser(editedItem) {
       if (editedItem.isAdmin === "yes") {
         this.$store.commit("setInfo", "Cannot disable user with admin rights");
@@ -249,6 +260,10 @@ export default {
     onAddUserProfile(user) {
       this.showAddUserProfile = false;
       this.addRowToTable(user);
+    },
+    onRefresh() {
+      this.items = [];
+      this.loadData();
     }
   }
 };
