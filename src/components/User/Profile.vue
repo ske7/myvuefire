@@ -152,20 +152,7 @@
         <app-alert :text="error.message" :code="error.code" @dismissed="onDismissed" />
       </v-flex>
     </v-layout>
-    <v-dialog v-model="relogindialog" max-width="280" persistent transition="fade-transition">
-      <v-card>
-        <v-layout row justify-center align-center>
-          <v-card-title class="subheading text-xs-center">Do you want to re-login?</v-card-title>
-        </v-layout>
-        <v-layout row justify-center align-center>
-          <v-flex text-xs-center mb-2>
-            <v-btn small color="green darken-5" outline @click.native="onRelogin()">Yes</v-btn>
-            <v-btn small color="green darken-5" outline @click.native="relogindialog = false">Cancel</v-btn>
-          </v-flex>
-        </v-layout>
-      </v-card>
-    </v-dialog>
-    <v-dialog v-model="relogindialog2" max-width="280" persistent transition="fade-transition">
+    <v-dialog v-model="relogindialog2" max-width="280" persistent transition="fade-transition" @keydown.enter="onRelogin()">
       <v-card>
         <v-layout row justify-center align-center>
           <v-card-title class="subheading text-xs-center">You need to relogin after checking verification email!</v-card-title>
@@ -177,19 +164,20 @@
         </v-layout>
       </v-card>
     </v-dialog>
-    <v-dialog v-model="profimgdeletedialog" max-width="280" persistent transition="fade-transition">
-      <v-card>
-        <v-layout row justify-center align-center>
-          <v-card-title class="subheading text-xs-center">Do you really want to delete your profile image?</v-card-title>
-        </v-layout>
-        <v-layout row justify-center align-center>
-          <v-flex text-xs-center mb-2>
-            <v-btn small color="green darken-5" outline @click.native="onDeleteProfileImage()">Yes</v-btn>
-            <v-btn small color="green darken-5" outline @click.native="profimgdeletedialog = false">Cancel</v-btn>
-          </v-flex>
-        </v-layout>
-      </v-card>
-    </v-dialog>
+    <keep-alive>
+      <app-yescanceldlg
+        :toggle="relogindialog"
+        question="Do you want to re-login?"
+        @cancel-dialog="relogindialog = false"
+        @accept-question="onRelogin()"/>
+    </keep-alive>
+    <keep-alive>
+      <app-yescanceldlg
+        :toggle="profimgdeletedialog"
+        question="Do you really want to delete your profile image?"
+        @cancel-dialog="profimgdeletedialog = false"
+        @accept-question="onDeleteProfileImage()"/>
+    </keep-alive>
     <app-processing :is-processing="isProcessing" />
     <keep-alive>
       <yesnowithtimedialog :toggle="profileEraseDialog" :initcounter="3" question="A you certainly want to erase your profile?" @cancel-dialog="profileEraseDialog = false" @accept-question="onEraseProfile()" />

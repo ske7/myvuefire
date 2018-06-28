@@ -1,5 +1,5 @@
 <template>
-  <v-dialog v-model="showAddUserProfile" persistent max-width="500px" transition="slide-y-transition">
+  <v-dialog v-model="showAddUserProfile" persistent max-width="500px" transition="slide-y-transition" @keydown.esc="onCloseForm()">
     <v-layout row>
       <v-flex xs12>
         <v-card class="blue-border-small" flat>

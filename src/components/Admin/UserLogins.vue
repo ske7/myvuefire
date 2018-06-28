@@ -1,5 +1,5 @@
 <template>
-  <v-dialog v-model="showUserLogins" persistent full-width hide-overlay scrollable fullscreen transition="slide-y-transition">
+  <v-dialog v-model="showUserLogins" persistent full-width hide-overlay scrollable fullscreen transition="slide-y-transition" @keydown.esc="onCloseForm()">
     <v-container fill-height fluid>
       <v-layout row wrap justify-center align-center>
         <v-card class="blue-border-small" flat>

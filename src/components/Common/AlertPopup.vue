@@ -1,5 +1,5 @@
 <template>
-  <v-dialog v-model="toggle" max-width="320" persistent transition="fade-transition">
+  <v-dialog v-model="toggle" max-width="320" persistent transition="fade-transition" @keydown.enter.esc="onDismissed()">
     <v-card>
       <v-layout row justify-center align-center>
         <v-card-title class="subheading text-xs-center">
@@ -50,11 +50,11 @@ export default {
   watch: {
     "toggle": function() {
       if (this.toggle) {
-        if (this.error !== null && this.error.message !== "" & this.initmessage === "") {
+        if (this.error !== null && this.error.message !== "" && this.initmessage === "") {
           this.message = this.error.message;
           this.btnColor = "error";
           this.icon = "error";
-        } else if (this.info !== "" & this.initmessage === "") {
+        } else if (this.info !== "" && this.initmessage === "") {
           this.message = this.info;
           this.btnColor = "info";
           this.icon = "info";
