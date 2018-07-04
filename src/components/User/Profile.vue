@@ -39,16 +39,13 @@
                   <v-flex text-xs-center fluid>
                     <v-toolbar dense card height="22px" color="transparent">
                       <v-tooltip bottom open-delay="500">
-                        <v-btn slot="activator" :loading="imgloading" :disabled="imgloading" class="btnprof" small flat @click="onChooseProfileImage()">
+                        <v-btn slot="activator" class="btnprof" small flat @click="onChooseProfileImage()">
                           <v-icon small color="blue darken-4">attachment</v-icon>
                         </v-btn>
-                        <span slot="loader" class="custom-loader">
-                          <v-icon light>cached</v-icon>
-                        </span>
                         <span>Load profile image</span>
                       </v-tooltip>
                       <v-tooltip bottom open-delay="500">
-                        <v-btn slot="activator" :disabled="imgloading" class="btnprof" small flat @click="onChooseToDeleteProfileImage()">
+                        <v-btn slot="activator" class="btnprof" small flat @click="onChooseToDeleteProfileImage()">
                           <v-icon small color="blue darken-4">clear</v-icon>
                         </v-btn>
                         <span>Delete profile image</span>
@@ -152,18 +149,12 @@
         <app-alert :text="error.message" :code="error.code" @dismissed="onDismissed" />
       </v-flex>
     </v-layout>
-    <v-dialog v-model="relogindialog2" max-width="280" persistent transition="fade-transition" @keydown.enter="onRelogin()">
-      <v-card>
-        <v-layout row justify-center align-center>
-          <v-card-title class="subheading text-xs-center">You need to relogin after checking verification email!</v-card-title>
-        </v-layout>
-        <v-layout row justify-center align-center>
-          <v-flex text-xs-center mb-2>
-            <v-btn small color="green darken-5" outline @click.native="onRelogin()">OK</v-btn>
-          </v-flex>
-        </v-layout>
-      </v-card>
-    </v-dialog>
+    <keep-alive>
+      <app-okdialog
+        :toggle="relogindialog2"
+        message="You need to relogin after checking verification email!"
+        @accept-message="onRelogin()"/>
+    </keep-alive>
     <keep-alive>
       <app-yescanceldlg
         :toggle="relogindialog"
@@ -247,9 +238,6 @@ export default {
     },
     loading3() {
       return this.$store.getters.loading3;
-    },
-    imgloading() {
-      return this.$store.getters.imgloading;
     },
     needToUpdate() {
       return this.oldDisplayName !== this.displayName;
@@ -416,7 +404,7 @@ export default {
       if (extension === ".jpe") {
         extension = ".jpeg";
       }
-
+      this.isProcessing = true;
       this.$store
         .dispatch("deleteProfileImage", {
           userid: this.$store.getters.user.uid,
@@ -425,7 +413,7 @@ export default {
         .then(() => {
           this.photoURL = "";
           this.$store.commit("setUserPhotoURL", "");
-          this.$store.commit("setImgLoading", false);
+          this.isProcessing = false;
         });
     },
     onChooseProfileImage() {
@@ -497,6 +485,7 @@ export default {
         };
       })
         .then(() => {
+          this.isProcessing = true;
           fileReader.onloadend = null;
           fileReader.readAsDataURL(file);
           this.$store
@@ -508,7 +497,7 @@ export default {
             .then((imageurl) => {
               this.$store.commit("setUserPhotoURL", imageurl);
               this.photoURL = imageurl;
-              this.$store.commit("setImgLoading", false);
+              this.isProcessing = false;
             });
         })
         .catch((error) => {

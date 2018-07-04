@@ -15,7 +15,6 @@ export const store = new Vuex.Store({
     loading2: false,
     loading3: false,
     signUpProcess: false,
-    imgloading: false,
     error: null,
     errorDialog: null,
     info: null,
@@ -40,9 +39,6 @@ export const store = new Vuex.Store({
     },
     setSignUpProcess(state, payload) {
       state.signUpProcess = payload;
-    },
-    setImgLoading(state, payload) {
-      state.imgloading = payload;
     },
     setError(state, payload) {
       state.error = payload;
@@ -382,7 +378,6 @@ export const store = new Vuex.Store({
     },
     setProfileImage({ commit }, payload) {
       return new Promise((resolve, reject) => {
-        commit("setImgLoading", true);
         commit("clearError");
 
         db.storage
@@ -411,7 +406,6 @@ export const store = new Vuex.Store({
             });
           })
           .catch((error) => {
-            commit("setImgLoading", false);
             commit("setError", error);
             reject(error);
           });
@@ -419,7 +413,6 @@ export const store = new Vuex.Store({
     },
     deleteProfileImage({ commit }, payload) {
       return new Promise((resolve, reject) => {
-        commit("setImgLoading", true);
         commit("clearError");
 
         db.storage
@@ -447,7 +440,6 @@ export const store = new Vuex.Store({
               });
           })
           .catch((error) => {
-            commit("setImgLoading", false);
             commit("setError", error);
             reject(error);
           });
@@ -495,9 +487,6 @@ export const store = new Vuex.Store({
     },
     loading3(state) {
       return state.loading3;
-    },
-    imgloading(state) {
-      return state.imgloading;
     },
     signUpProcess(state) {
       return state.signUpProcess;
