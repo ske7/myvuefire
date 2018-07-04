@@ -1,13 +1,11 @@
 <template>
-  <v-dialog v-model="showUserLogins" persistent full-width hide-overlay scrollable fullscreen transition="slide-y-transition" @keydown.esc="onCloseForm()">
+  <v-dialog v-model="showUserLogins" persistent full-width fullscreen transition="slide-y-transition" @keydown.esc="onCloseForm()">
     <v-container fill-height fluid>
       <v-layout row wrap justify-center align-center>
-        <v-card class="blue-border-small" flat>
-          <v-layout row justify-center align-center>
-            <v-card-title primary-title class="headline blue--text text--darken-4 justify-center">
-              User logins
-            </v-card-title>
-          </v-layout>
+        <v-card style="background-color: #F1F8E9 !important;" class="blue-border-small" flat>
+          <v-card-title primary-title class="headline blue--text text--darken-4 justify-center">
+            User logins
+          </v-card-title>
           <v-layout row wrap justify-center align-center ml-3 mr-3 mb-3>
             <v-flex xs12>
               <div>
@@ -17,7 +15,7 @@
                               :rows-per-page-items="[10, 5]"
                               :pagination.sync="pagination"
                               :custom-sort="customSort"
-                              class="elevation-3 mt-1">
+                              class="elevation-1 mt-1">
                   <template slot="headerCell" slot-scope="props">
                     <span>
                       {{ props.header.text }}
@@ -38,7 +36,26 @@
           </v-layout>
           <v-layout row justify-center align-center>
             <v-flex text-xs-center mb-3>
-              <v-btn small color="green darken-5" outline @click.native="onCloseForm()">Close</v-btn>
+              <v-tooltip top open-delay="600">
+                <v-btn slot="activator"
+                       small
+                       color="blue-grey darken-3"
+                       dark
+                       @click.native="onTryToLoadData()">
+                  <v-icon blue-grey>refresh</v-icon>
+                </v-btn>
+                <span>Refresh</span>
+              </v-tooltip>
+              <v-tooltip top open-delay="600">
+                <v-btn slot="activator"
+                       small
+                       color="indigo"
+                       dark
+                       @click.native="onCloseForm()">
+                  <v-icon>clear</v-icon>
+                </v-btn>
+                <span>Close form</span>
+              </v-tooltip>
             </v-flex>
           </v-layout>
         </v-card>
@@ -96,42 +113,7 @@ export default {
   watch: {
     "uid": function() {
       if (this.uid !== "") {
-        this.dataloading = true;
-        let arr = [];
-        this.items = [];
-        db.firestore.collection("users").doc(this.uid).collection("logins")
-          .get()
-          .then((querySnapshot) => {
-            querySnapshot.forEach((doc) => {
-              arr = doc.data();
-              const arr2 = {};
-
-              Object.keys(arr).forEach((key) => {
-                const value = arr[key];
-
-                if (key === "loginTime" ||
-                    key === "userip" ||
-                    key === "utc_offset" ||
-                    key === "providerId" ||
-                    key === "emailVerified") {
-                  arr2[key] = value;
-                  if (value === true) {
-                    arr2[key] = "yes";
-                  }
-                  if (value === false) {
-                    arr2[key] = "-";
-                  }
-                }
-              });
-              this.items.push(arr2);
-            });
-          }).then(() => {
-            this.dataloading = false;
-          })
-          .catch((error) => {
-            this.dataloading = false;
-            this.$store.commit("setErrorDialog", error);
-          });
+        this.onTryToLoadData();
       }
     }
   },
@@ -144,6 +126,44 @@ export default {
     },
     onCloseForm() {
       this.$emit("closeform");
+    },
+    onTryToLoadData() {
+      this.dataloading = true;
+      let arr = [];
+      this.items = [];
+      db.firestore.collection("users").doc(this.uid).collection("logins")
+        .get()
+        .then((querySnapshot) => {
+          querySnapshot.forEach((doc) => {
+            arr = doc.data();
+            const arr2 = {};
+
+            Object.keys(arr).forEach((key) => {
+              const value = arr[key];
+
+              if (key === "loginTime" ||
+                    key === "userip" ||
+                    key === "utc_offset" ||
+                    key === "providerId" ||
+                    key === "emailVerified") {
+                arr2[key] = value;
+                if (value === true) {
+                  arr2[key] = "yes";
+                }
+                if (value === false) {
+                  arr2[key] = "-";
+                }
+              }
+            });
+            this.items.push(arr2);
+          });
+        }).then(() => {
+          this.dataloading = false;
+        })
+        .catch((error) => {
+          this.dataloading = false;
+          this.$store.commit("setErrorDialog", error);
+        });
     }
   }
 };
