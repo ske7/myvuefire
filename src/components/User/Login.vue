@@ -44,63 +44,69 @@
                   </v-flex>
                 </v-layout>
               </v-form>
-              <v-layout row>
-                <v-flex xs12 text-xs-center mt-1 mb-1 body-2>
-                  or
-                </v-flex>
-              </v-layout>
-              <v-layout row justify-center align-center>
-                <v-flex text-xs-center>
-                  <v-btn
-                    small
-                    color="red"
-                    dark
-                    round
-                    @click="onSignupWithGoogle">
-                    <i class="fa fa-google-plus"/>
-                    <span class="ml-1">Sign in with Google</span>
-                    <span slot="loader" class="custom-loader">
-                      <v-icon light>cached</v-icon>
-                    </span>
-                  </v-btn>
-                  <v-btn
-                    small
-                    color="blue darken-4"
-                    dark
-                    round
-                    @click="onSignupWithFacebook">
-                    <i class="fa fa-facebook-f"/>
-                    <span class="ml-1">Sign in with Facebook</span>
-                    <span slot="loader" class="custom-loader">
-                      <v-icon light>cached</v-icon>
-                    </span>
-                  </v-btn>
-                  <v-btn
-                    small
-                    color="grey darken-4"
-                    dark
-                    round
-                    @click="onSignupWithGithub">
-                    <i class="fa fa-github"/>
-                    <span class="ml-1">Sign in with Github</span>
-                    <span slot="loader" class="custom-loader">
-                      <v-icon light>cached</v-icon>
-                    </span>
-                  </v-btn>
-                  <v-btn
-                    small
-                    color="blue lighten-1"
-                    dark
-                    round
-                    @click="onSignupWithTwitter">
-                    <i class="fa fa-twitter"/>
-                    <span class="ml-1">Sign in with Twitter</span>
-                    <span slot="loader" class="custom-loader">
-                      <v-icon light>cached</v-icon>
-                    </span>
-                  </v-btn>
-                </v-flex>
-              </v-layout>
+              <template v-if="useGoogleProvider || useFacebookProvider || useGitHubProvider || useTwitterProvider">
+                <v-layout row>
+                  <v-flex xs12 text-xs-center mt-1 mb-1 body-2>
+                    or
+                  </v-flex>
+                </v-layout>
+                <v-layout row justify-center align-center>
+                  <v-flex text-xs-center>
+                    <v-btn
+                      v-if="useGoogleProvider"
+                      small
+                      color="red"
+                      dark
+                      round
+                      @click="onSignupWithGoogle">
+                      <i class="fa fa-google-plus"/>
+                      <span class="ml-1">Sign in with Google</span>
+                      <span slot="loader" class="custom-loader">
+                        <v-icon light>cached</v-icon>
+                      </span>
+                    </v-btn>
+                    <v-btn
+                      v-if="useFacebookProvider"
+                      small
+                      color="blue darken-4"
+                      dark
+                      round
+                      @click="onSignupWithFacebook">
+                      <i class="fa fa-facebook-f"/>
+                      <span class="ml-1">Sign in with Facebook</span>
+                      <span slot="loader" class="custom-loader">
+                        <v-icon light>cached</v-icon>
+                      </span>
+                    </v-btn>
+                    <v-btn
+                      v-if="useGitHubProvider"
+                      small
+                      color="grey darken-4"
+                      dark
+                      round
+                      @click="onSignupWithGithub">
+                      <i class="fa fa-github"/>
+                      <span class="ml-1">Sign in with Github</span>
+                      <span slot="loader" class="custom-loader">
+                        <v-icon light>cached</v-icon>
+                      </span>
+                    </v-btn>
+                    <v-btn
+                      v-if="useTwitterProvider"
+                      small
+                      color="blue lighten-1"
+                      dark
+                      round
+                      @click="onSignupWithTwitter">
+                      <i class="fa fa-twitter"/>
+                      <span class="ml-1">Sign in with Twitter</span>
+                      <span slot="loader" class="custom-loader">
+                        <v-icon light>cached</v-icon>
+                      </span>
+                    </v-btn>
+                  </v-flex>
+                </v-layout>
+              </template>
               <v-layout row>
                 <v-flex xs12 text-xs-center mt-2>
                   <router-link to="/reset">Forgot your password?</router-link>
@@ -142,6 +148,18 @@ export default {
     },
     loading() {
       return this.$store.getters.loading;
+    },
+    useGoogleProvider() {
+      return this.$store.getters.useGoogleProvider;
+    },
+    useFacebookProvider() {
+      return this.$store.getters.useFacebookProvider;
+    },
+    useTwitterProvider() {
+      return this.$store.getters.useTwitterProvider;
+    },
+    useGitHubProvider() {
+      return this.$store.getters.useGitHubProvider;
     }
   },
   created() {

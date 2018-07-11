@@ -56,6 +56,16 @@ defvm.$mount("#def");
 
 let vm;
 
+db.firestore
+  .collection("config")
+  .doc("configDoc")
+  .onSnapshot((doc) => {
+    store.commit("setUseGoogleProvider", doc.data().googleProvider);
+    store.commit("setUseFacebookProvider", doc.data().facebookProvider);
+    store.commit("setUseTwitterProvider", doc.data().twitterProvider);
+    store.commit("setUseGitHubProvider", doc.data().githubProvider);
+  });
+
 db.auth.onAuthStateChanged(async(user) => {
   try {
     if (store.state.signUpProcess) return false;

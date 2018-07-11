@@ -226,6 +226,22 @@ function deleteQueryBatch(query, batchSize, resolve, reject) {
     .catch(reject);
 }
 
+function saveAuthModesToConfig(authmodes) {
+  const googleProvider = authmodes.indexOf("Google") !== -1;
+  const facebookProvider = authmodes.indexOf("Facebook") !== -1;
+  const twitterProvider = authmodes.indexOf("Twitter") !== -1;
+  const githubProvider = authmodes.indexOf("GitHub") !== -1;
+  return firestore
+    .collection("config")
+    .doc("configDoc")
+    .set({
+      googleProvider: googleProvider,
+      facebookProvider: facebookProvider,
+      twitterProvider: twitterProvider,
+      githubProvider: githubProvider
+    }, { merge: true });
+}
+
 // ------------------------------------- //
 export default {
   firebase,
@@ -246,5 +262,6 @@ export default {
   updateUserDisable,
   updateUserProviderId,
   deleteCollection,
-  deleteQueryBatch
+  deleteQueryBatch,
+  saveAuthModesToConfig
 };

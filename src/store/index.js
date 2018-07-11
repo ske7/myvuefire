@@ -21,7 +21,11 @@ export const store = new Vuex.Store({
     confData: null,
     ip: "0.0.0.0",
     ipdata: null,
-    adminDrawer: null
+    adminDrawer: null,
+    useGoogleProvider: false,
+    useFacebookProvider: false,
+    useTwitterProvider: false,
+    useGitHubProvider: false
   },
 
   mutations: {
@@ -96,6 +100,18 @@ export const store = new Vuex.Store({
     },
     adminDrawerToggle(state, payload) {
       state.adminDrawer = !state.adminDrawer;
+    },
+    setUseGoogleProvider(state, payload) {
+      state.useGoogleProvider = payload;
+    },
+    setUseFacebookProvider(state, payload) {
+      state.useFacebookProvider = payload;
+    },
+    setUseTwitterProvider(state, payload) {
+      state.useTwitterProvider = payload;
+    },
+    setUseGitHubProvider(state, payload) {
+      state.useGitHubProvider = payload;
     }
   },
 
@@ -124,7 +140,8 @@ export const store = new Vuex.Store({
                   displayName: payload.displayName,
                   photoURL: "",
                   providerId: "password",
-                  isAdmin: state.confData.adminemail === user.email
+                  isAdmin:
+                           state.confData.adminemail === user.email
                 };
                 db.addUser(
                   user,
@@ -509,6 +526,18 @@ export const store = new Vuex.Store({
       } else {
         return state.user.emailVerified;
       }
+    },
+    useGoogleProvider(state) {
+      return state.useGoogleProvider;
+    },
+    useFacebookProvider(state) {
+      return state.useFacebookProvider;
+    },
+    useTwitterProvider(state) {
+      return state.useTwitterProvider;
+    },
+    useGitHubProvider(state) {
+      return state.useGitHubProvider;
     }
   }
 });
