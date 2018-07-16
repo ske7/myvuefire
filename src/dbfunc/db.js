@@ -151,35 +151,52 @@ function updateUserInfoWhenLogin(user, lastSignInTime, extproviderId) {
     const userRef = firestore.collection("users").doc(user.uid);
 
     userRef
-      .set(
-        {
-          emailVerified: user.emailVerified,
-          lastSignInTime: lastSignInTime
-        },
-        { merge: true }
-      )
-      .then(() => {
-        userRef.collection("logins").add({
-          loginTime: lastSignInTime,
-          emailVerified: user.emailVerified,
-          providerId:
-            extproviderId !== undefined ? extproviderId : user.providerId,
-          userip: store.state.ip,
-          country:
-            store.state.ipdata !== null
-              ? store.state.ipdata.country_name
-              : null,
-          city: store.state.ipdata !== null ? store.state.ipdata.city : null,
-          timezone:
-            store.state.ipdata !== null ? store.state.ipdata.timezone : null,
-          utc_offset:
-            store.state.ipdata !== null ? store.state.ipdata.utc_offset : null,
-          latitude:
-            store.state.ipdata !== null ? store.state.ipdata.latitude : null,
-          longitude:
-            store.state.ipdata !== null ? store.state.ipdata.longitude : null
-        });
-        resolve(userRef);
+      .get()
+      .then((doc) => {
+        if (!doc.exists) {
+          return addUser(user, store.state.confData.adminemail === user.email, extproviderId, false)
+            .then((userRef) => {
+              resolve(userRef);
+            })
+            .catch((error) => {
+              reject(error);
+            });
+        } else {
+          userRef
+            .set(
+              {
+                emailVerified: user.emailVerified,
+                lastSignInTime: lastSignInTime
+              },
+              { merge: true }
+            )
+            .then(() => {
+              userRef.collection("logins").add({
+                loginTime: lastSignInTime,
+                emailVerified: user.emailVerified,
+                providerId:
+                  extproviderId !== undefined ? extproviderId : user.providerId,
+                userip: store.state.ip,
+                country:
+                  store.state.ipdata !== null
+                    ? store.state.ipdata.country_name
+                    : null,
+                city: store.state.ipdata !== null ? store.state.ipdata.city : null,
+                timezone:
+                  store.state.ipdata !== null ? store.state.ipdata.timezone : null,
+                utc_offset:
+                  store.state.ipdata !== null ? store.state.ipdata.utc_offset : null,
+                latitude:
+                  store.state.ipdata !== null ? store.state.ipdata.latitude : null,
+                longitude:
+                  store.state.ipdata !== null ? store.state.ipdata.longitude : null
+              });
+              resolve(userRef);
+            })
+            .catch((error) => {
+              reject(error);
+            });
+        }
       })
       .catch((error) => {
         reject(error);
