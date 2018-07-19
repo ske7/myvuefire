@@ -31,6 +31,18 @@
           </v-btn>
           <span>Refresh</span>
         </v-tooltip>
+        <v-tooltip top open-delay="600">
+          <v-btn slot="activator"
+                 top
+                 fab
+                 small
+                 color="teal darken-2"
+                 dark
+                 @click="onExport()">
+            <v-icon>save_alt</v-icon>
+          </v-btn>
+          <span>Export to CSV file</span>
+        </v-tooltip>
       </v-flex>
     </v-layout>
     <v-data-table :headers="headers"
@@ -96,6 +108,8 @@
 <script>
 import db from "@/dbfunc/db";
 import mixins from "@/helpers/mixins";
+import { parse as json2csv } from "json2csv";
+import cloneDeep from "lodash.clonedeep";
 
 export default {
   name: "Users",
@@ -168,6 +182,9 @@ export default {
         if (key === "email" ||
               key === "displayName" ||
               key === "uid" ||
+              key === "photoURL" ||
+              key === "passwordHash" ||
+              key === "passwordSalt" ||
               key === "disabled" ||
               key === "emailVerified") {
           arr2[key] = value;
@@ -264,6 +281,72 @@ export default {
     onRefresh() {
       this.items = [];
       this.loadData();
+    },
+    filteredItems() {
+      return this.items.map((item) => {
+        const newItem = cloneDeep(item);
+        newItem.creationTime = this.$options.filters.formatDate(item.creationTime);
+        newItem.lastSignInTime = this.$options.filters.formatDate(item.lastSignInTime);
+        return newItem;
+      });
+    },
+    onExport() {
+      try {
+        const fields = [
+          {
+            label: "User ID",
+            value: "uid"
+          }, {
+            label: "Email",
+            value: "email"
+          }, {
+            label: "User name",
+            value: "displayName"
+          }, {
+            label: "Created",
+            value: "creationTime"
+          }, {
+            label: "Signed In",
+            value: "lastSignInTime"
+          }, {
+            label: "Profile image",
+            value: "photoURL"
+          }, {
+            label: "Provider",
+            value: "providerId"
+          }, {
+            label: "Admin",
+            value: "isAdmin"
+          }, {
+            label: "Verified",
+            value: "emailVerified"
+          }, {
+            label: "Locked",
+            value: "disabled"
+          }, {
+            label: "passwordHash",
+            value: "passwordHash"
+          }, {
+            label: "passwordSalt",
+            value: "passwordSalt"
+          }
+        ];
+        const opts = { fields, delimiter: ";" };
+        const csv = json2csv(this.filteredItems(), opts);
+
+        const csvContent = "data:text/csvcharset=UTF-8,\uFEFF" + csv;
+        const encodedUri = encodeURI(csvContent);
+        const fileName = "users";
+
+        const link = document.createElement("a");
+        link.setAttribute("href", encodedUri);
+        link.setAttribute("download", `${(fileName || "file")}.csv`);
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      } catch (err) {
+        this.$store.commit("setError", err);
+      }
     }
   }
 };
