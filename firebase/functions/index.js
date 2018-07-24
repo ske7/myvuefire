@@ -3,7 +3,7 @@ const functions = require("firebase-functions");
 const admin = require("firebase-admin");
 
 // Init
-admin.initializeApp(functions.config().firebase);
+admin.initializeApp();
 
 // Inner functions
 function deleteCollection(collectionPath, batchSize) {
