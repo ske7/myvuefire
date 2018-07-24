@@ -291,6 +291,7 @@ export default {
       });
     },
     onExport() {
+      this.isProcessing = true;
       try {
         const fields = [
           {
@@ -346,6 +347,8 @@ export default {
         document.body.removeChild(link);
       } catch (err) {
         this.$store.commit("setError", err);
+      } finally {
+        this.isProcessing = false;
       }
     }
   }

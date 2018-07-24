@@ -49,6 +49,16 @@
               <v-tooltip top open-delay="600">
                 <v-btn slot="activator"
                        small
+                       color="teal darken-2"
+                       dark
+                       @click.native="onExport()">
+                  <v-icon blue-grey>save_alt</v-icon>
+                </v-btn>
+                <span>Export to CSV file</span>
+              </v-tooltip>
+              <v-tooltip top open-delay="600">
+                <v-btn slot="activator"
+                       small
                        color="indigo"
                        dark
                        @click.native="onCloseForm()">
@@ -61,12 +71,15 @@
         </v-card>
       </v-layout>
     </v-container>
+    <app-processing :is-processing="isProcessing" />
   </v-dialog>
 </template>
 
 <script>
 import db from "@/dbfunc/db";
 import mixins from "@/helpers/mixins";
+import { parse as json2csv } from "json2csv";
+import cloneDeep from "lodash.clonedeep";
 
 export default {
   name: "UserLogins",
@@ -100,7 +113,8 @@ export default {
         { text: "Verified", value: "emailVerified", align: "center" }
       ],
       items: [],
-      dateColumns: ["loginTime"]
+      dateColumns: ["loginTime"],
+      isProcessing: false
     };
   },
   computed: {
@@ -164,6 +178,53 @@ export default {
           this.dataloading = false;
           this.$store.commit("setErrorDialog", error);
         });
+    },
+    filteredItems() {
+      return this.items.map((item) => {
+        const newItem = cloneDeep(item);
+        newItem.loginTime = this.$options.filters.formatDate(item.loginTime);
+        return newItem;
+      });
+    },
+    onExport() {
+      this.isProcessing = true;
+      try {
+        const fields = [
+          {
+            label: "Login time",
+            value: "loginTime"
+          }, {
+            label: "UTC offcet",
+            value: "utc_offset"
+          }, {
+            label: "User I",
+            value: "userip"
+          }, {
+            label: "Provider",
+            value: "providerId"
+          }, {
+            label: "Verified",
+            value: "emailVerified"
+          }
+        ];
+        const opts = { fields, delimiter: ";" };
+        const csv = json2csv(this.filteredItems(), opts);
+
+        const csvContent = "data:text/csvcharset=UTF-8,\uFEFF" + csv;
+        const encodedUri = encodeURI(csvContent);
+        const fileName = "userlogins";
+
+        const link = document.createElement("a");
+        link.setAttribute("href", encodedUri);
+        link.setAttribute("download", `${(fileName || "file")}.csv`);
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      } catch (err) {
+        this.$store.commit("setError", err);
+      } finally {
+        this.isProcessing = false;
+      }
     }
   }
 };
