@@ -244,19 +244,22 @@ function deleteQueryBatch(query, batchSize, resolve, reject) {
 }
 
 function saveAuthModesToConfig(authmodes) {
-  const googleProvider = authmodes.indexOf("Google") !== -1;
-  const facebookProvider = authmodes.indexOf("Facebook") !== -1;
-  const twitterProvider = authmodes.indexOf("Twitter") !== -1;
-  const githubProvider = authmodes.indexOf("GitHub") !== -1;
-  return firestore
-    .collection("config")
-    .doc("configDoc")
-    .set({
-      googleProvider: googleProvider,
-      facebookProvider: facebookProvider,
-      twitterProvider: twitterProvider,
-      githubProvider: githubProvider
-    }, { merge: true });
+  return new Promise((resolve, reject) => {
+    try {
+      const googleProvider = authmodes.indexOf("Google") !== -1;
+      const facebookProvider = authmodes.indexOf("Facebook") !== -1;
+      const twitterProvider = authmodes.indexOf("Twitter") !== -1;
+      const githubProvider = authmodes.indexOf("GitHub") !== -1;
+      return firestore
+        .collection("config")
+        .doc("configDoc")
+        .set({ googleProvider: googleProvider, facebookProvider: facebookProvider, twitterProvider: twitterProvider, githubProvider: githubProvider }, { merge: true }).then(() => {
+          resolve(true);
+        });
+    } catch (error) {
+      reject(error);
+    }
+  });
 }
 
 // ------------------------------------- //

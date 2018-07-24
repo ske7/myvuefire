@@ -25,7 +25,8 @@ export const store = new Vuex.Store({
     useGoogleProvider: false,
     useFacebookProvider: false,
     useTwitterProvider: false,
-    useGitHubProvider: false
+    useGitHubProvider: false,
+    appNameText: ""
   },
 
   mutations: {
@@ -112,6 +113,9 @@ export const store = new Vuex.Store({
     },
     setUseGitHubProvider(state, payload) {
       state.useGitHubProvider = payload;
+    },
+    setAppNameText(state, payload) {
+      state.appNameText = payload;
     }
   },
 
@@ -538,6 +542,9 @@ export const store = new Vuex.Store({
     },
     useGitHubProvider(state) {
       return state.useGitHubProvider;
+    },
+    appNameText(state) {
+      return state.appNameText;
     }
   }
 });

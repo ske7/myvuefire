@@ -2,10 +2,9 @@
   <v-container>
     <v-layout row wrap class="page blue-border">
       <v-flex text-xs-center>
-        <h1 class="display-1">{{ msg }}</h1>
+        <h1 class="display-1">{{ welcomeMessage }}</h1>
       </v-flex>
     </v-layout>
-
     <v-layout row>
       <v-dialog v-model="isNotVerified" max-width="280" persistent transition="fade-transition">
         <v-card>
@@ -28,9 +27,14 @@ export default {
   name: "Page",
   data() {
     return {
-      isNotVerified: false,
-      msg: "Welcome to Your VueFire CRM!"
+      isNotVerified: false
     };
+  },
+  computed: {
+    welcomeMessage() {
+      const name = this.$store.getters.appNameText || "VueFire CRM";
+      return `Welcome to Your ${name}!`;
+    }
   },
   created() {
     this.$store.dispatch("clearError");

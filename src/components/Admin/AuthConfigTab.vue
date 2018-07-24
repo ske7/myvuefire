@@ -1,5 +1,5 @@
 <template>
-  <v-card class="blue-border-sma1ll" flat color="transparent">
+  <v-card flat color="transparent">
     <v-container fluid px-3>
       <v-flex xs6 text-xs-left>
         <v-card-text>Enable OAuth providers</v-card-text>
@@ -81,11 +81,11 @@ export default {
       this.$store.dispatch("clearError");
     },
     onSaveSettings() {
-      this.needToSave = false;
       this.$store.commit("setLoading", true);
       db.saveAuthModesToConfig(this.authmodes).then(() => {
         this.oldauthmodes = this.authmodes;
         this.$store.commit("setLoading", false);
+        this.needToSave = false;
       }).catch((error) => {
         this.$store.commit("setLoading", false);
         this.$store.commit("setError", error);

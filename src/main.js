@@ -64,6 +64,7 @@ db.firestore
     store.commit("setUseFacebookProvider", doc.data().facebookProvider);
     store.commit("setUseTwitterProvider", doc.data().twitterProvider);
     store.commit("setUseGitHubProvider", doc.data().githubProvider);
+    store.commit("setAppNameText", doc.data().appNameText);
   });
 
 db.auth.onAuthStateChanged(async(user) => {
