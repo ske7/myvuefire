@@ -60,8 +60,15 @@ export default {
   created() {
     this.$store.dispatch("clearError");
     this.needToSave = false;
-    this.appheader = this.appNameText;
-    this.oldappheader = this.appNameText;
+    db.firestore
+      .collection("config")
+      .doc("configDoc")
+      .get().then((doc) => {
+        this.$store.commit("setAppNameText", doc.data().appNameText);
+      }).then(() => {
+        this.appheader = this.appNameText;
+        this.oldappheader = this.appNameText;
+      });
   },
   methods: {
     onChange() {

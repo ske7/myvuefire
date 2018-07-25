@@ -120,7 +120,20 @@ export const store = new Vuex.Store({
   },
 
   actions: {
-    signUserUp({ commit, state }, payload) {
+    setIPData({ commit }) {
+      axios
+        .get("https://ipapi.co/json/")
+        .then((response) => {
+          commit("setUserIP", response.data.ip);
+          commit("setUserIPData", response.data);
+        })
+        .catch((error) => {
+          commit("setUserIP", "0.0.0.0");
+          commit("setUserIPData", null);
+          commit("setError", error);
+        });
+    },
+    signUserUp({ commit, state, dispatch }, payload) {
       return new Promise((resolve, reject) => {
         commit("setSignUpProcess", true);
         commit("clearError");
@@ -131,6 +144,7 @@ export const store = new Vuex.Store({
             payload.password
           )
           .then((result) => {
+            dispatch("setIPData");
             const user = result.user;
             user
               .updateProfile({
@@ -177,6 +191,7 @@ export const store = new Vuex.Store({
             payload.password
           )
           .then((result) => {
+            dispatch("setIPData");
             const user = result.user;
             db.updateUserInfoWhenLogin(
               user,

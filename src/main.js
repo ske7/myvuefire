@@ -140,18 +140,7 @@ db.auth.onAuthStateChanged(async(user) => {
 
     if (!vm) {
       if (user) {
-        await axios
-          .get("https://ipapi.co/json/")
-          .then((response) => {
-            store.commit("setUserIP", response.data.ip);
-            store.commit("setUserIPData", response.data);
-          })
-          .catch((error) => {
-            store.commit("setUserIP", "0.0.0.0");
-            store.commit("setUserIPData", null);
-            store.commit("setError", error);
-          });
-
+        await store.dispatch("setIPData");
         await store.dispatch("autoLogin", { redirectResult, user });
       } else {
         await store.dispatch("logout");

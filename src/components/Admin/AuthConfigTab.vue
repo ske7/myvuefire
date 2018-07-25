@@ -55,19 +55,29 @@ export default {
   created() {
     this.$store.dispatch("clearError");
     this.needToSave = false;
-    if (this.$store.getters.useGoogleProvider === true) {
-      this.authmodes.push("Google");
-    }
-    if (this.$store.getters.useFacebookProvider === true) {
-      this.authmodes.push("Facebook");
-    }
-    if (this.$store.getters.useTwitterProvider === true) {
-      this.authmodes.push("Twitter");
-    }
-    if (this.$store.getters.useGitHubProvider === true) {
-      this.authmodes.push("GitHub");
-    }
-    this.oldauthmodes = this.authmodes;
+    db.firestore
+      .collection("config")
+      .doc("configDoc")
+      .get().then((doc) => {
+        this.$store.commit("setUseGoogleProvider", doc.data().googleProvider);
+        this.$store.commit("setUseFacebookProvider", doc.data().facebookProvider);
+        this.$store.commit("setUseTwitterProvider", doc.data().twitterProvider);
+        this.$store.commit("setUseGitHubProvider", doc.data().githubProvider);
+      }).then(() => {
+        if (this.$store.getters.useGoogleProvider === true) {
+          this.authmodes.push("Google");
+        }
+        if (this.$store.getters.useFacebookProvider === true) {
+          this.authmodes.push("Facebook");
+        }
+        if (this.$store.getters.useTwitterProvider === true) {
+          this.authmodes.push("Twitter");
+        }
+        if (this.$store.getters.useGitHubProvider === true) {
+          this.authmodes.push("GitHub");
+        }
+        this.oldauthmodes = this.authmodes;
+      });
   },
   methods: {
     onChange() {
