@@ -92,6 +92,7 @@ export default {
       if (this.showAddUserProfile) {
         return this.$store.getters.errorDialog;
       }
+      return null;
     }
   },
   watch: {

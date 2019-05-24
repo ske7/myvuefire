@@ -122,6 +122,7 @@ export default {
       if (this.showUserLogins === true) {
         return this.$store.getters.errorDialog;
       }
+      return null;
     }
   },
   watch: {
