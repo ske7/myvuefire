@@ -139,7 +139,6 @@ const createUser = functions.https.onCall((data, context) => {
     });
 });
 
-
 // Exports
 module.exports = {
   deleteUserProfile,
